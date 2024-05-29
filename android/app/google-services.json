@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "79570893103",
+    "project_id": "match-app-47439",
+    "storage_bucket": "match-app-47439.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79570893103:android:274f1a691d114f8b8ac9da",
+        "android_client_info": {
+          "package_name": "com.example.fluuter_dashboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFauosGm0ULUHO4gFZQFZO27J7ONVSPTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79570893103:android:4bd4ea83a0b5db658ac9da",
+        "android_client_info": {
+          "package_name": "com.example.match_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFauosGm0ULUHO4gFZQFZO27J7ONVSPTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
