@@ -1,13 +1,15 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:match_app/features/models/game_model.dart';
+import 'package:match_app/features/models/h2h_model.dart'; // Updated import
 
 class HeadToHeadController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  RxList<Game> headToHeadMatches = <Game>[].obs;
+  RxList<HeadToHeadMatch> headToHeadMatches =
+      <HeadToHeadMatch>[].obs; // Updated type
 
-  Future<void> fetchHeadToHeadMatches(String homeTeamId, String awayTeamId) async {
+  Future<void> fetchHeadToHeadMatches(
+      String homeTeamId, String awayTeamId) async {
     try {
       // Try to get the document with homeTeamId-awayTeamId
       DocumentSnapshot snapshot = await _firestore
@@ -25,19 +27,21 @@ class HeadToHeadController extends GetxController {
 
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>;
-        final matchesData = data['response'] as List<dynamic>;
+        final matchesData = data['response']; // Updated
+        print("MatchesData: $matchesData"); // Print matchesData here
+        // Check if matchesData exists and is a List
+        if (matchesData != null && matchesData is List) {
+          final List<HeadToHeadMatch> matches = matchesData
+              .map((match) => HeadToHeadMatch.fromJson(
+                  (match as Map<String, dynamic>))) // Updated type
+              .toList();
+          print("MatchesData: $matches"); // Print matchesData here
 
-        print('Total Matches: ${matchesData.length}');
-        
-        for (var match in matchesData) {
-          print('Match Data: $match');
+          headToHeadMatches.assignAll(matches);
+        } else {
+          // If matchesData is null or not a List, clear the matches list
+          headToHeadMatches.clear();
         }
-
-        final List<Game> matches = matchesData
-            .map((match) => Game.fromJson(_handleNullValues(match as Map<String, dynamic>)))
-            .toList();
-
-        headToHeadMatches.assignAll(matches);
       } else {
         // Handle case where no head-to-head matches are found
         headToHeadMatches.clear();
@@ -49,22 +53,4 @@ class HeadToHeadController extends GetxController {
   }
 
   // Handle null values by providing default values
-  Map<String, dynamic> _handleNullValues(Map<String, dynamic> json) {
-    return {
-      'homeTeam': json['homeTeam'] ?? {'name': 'Unknown', 'logo': '', 'id': ''},
-      'awayTeam': json['awayTeam'] ?? {'name': 'Unknown', 'logo': '', 'id': ''},
-      'date': json['date'] ?? DateTime.now().toString(),
-      'time': json['time'] ?? '00:00',
-      'status': {
-        'long': json['status']?['long'] ?? 'Unknown',
-        'short': json['status']?['short'] ?? 'NS',
-      },
-      'homeScore': {
-        'total': json['homeScore']?['total'] ?? 0,
-      },
-      'awayScore': {
-        'total': json['awayScore']?['total'] ?? 0,
-      },
-    };
-  }
 }

@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:match_app/features/models/game_model.dart';
+import 'package:match_app/features/models/h2h_model.dart'; // Ensure this import for HeadToHeadMatch
 import 'package:intl/intl.dart';
 
 class MatchDetailsPage extends StatefulWidget {
-  final Game matchDetails;
+  final Game? matchDetails;
+  final HeadToHeadMatch? headToHeadDetails;
 
-  const MatchDetailsPage({super.key, required this.matchDetails});
+  const MatchDetailsPage({
+    Key? key,
+    this.matchDetails,
+    this.headToHeadDetails,
+  }) : super(key: key);
 
   @override
   _MatchDetailsPageState createState() => _MatchDetailsPageState();
 }
 
-class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerProviderStateMixin {
+class _MatchDetailsPageState extends State<MatchDetailsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -45,29 +52,51 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Tournament Name',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    Text(
+                      widget.matchDetails != null
+                          ? widget.matchDetails!.leagueName
+                          : widget.headToHeadDetails!.leagueName,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildTeamInfo(widget.matchDetails.homeTeam.name,widget.matchDetails.homeTeam.logo),
-                        _buildVersusText(widget.matchDetails.homeScore.total, widget.matchDetails.awayScore.total),
-                        _buildTeamInfo(widget.matchDetails.awayTeam.name,widget.matchDetails.awayTeam.logo),
+                        _buildTeamInfo(
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeTeam.name
+                              : widget.headToHeadDetails!.homeTeam.name,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeTeam.logo
+                              : widget.headToHeadDetails!.homeTeam.logo,
+                        ),
+                        _buildVersusText(
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeScore.total
+                              : widget.headToHeadDetails!.homeScore.total,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayScore.total
+                              : widget.headToHeadDetails!.awayScore.total,
+                        ),
+                        _buildTeamInfo(
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayTeam.name
+                              : widget.headToHeadDetails!.awayTeam.name,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayTeam.logo
+                              : widget.headToHeadDetails!.awayTeam.logo,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     Center(
-                      child: widget.matchDetails.status.long == 'Not Started'
-                          ? Text(
-                              'Match Time: ${DateFormat('hh:mm a').format(widget.matchDetails.date)}',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            )
-                          : widget.matchDetails.status.long == 'Finished'
-                              ? Text('Winner: ${widget.matchDetails.homeScore.total! > widget.matchDetails.awayScore.total! ? widget.matchDetails.homeTeam.name : widget.matchDetails.awayTeam.name}')
-                              : Text('Status: ${widget.matchDetails.status.long}'),
+                      child: Text(
+                        widget.matchDetails != null
+                            ? 'Match Time: ${DateFormat('hh:mm a').format(widget.matchDetails!.date)}'
+                            : 'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(widget.headToHeadDetails!.date))}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     const SizedBox(height: 20),
                   ],
@@ -81,8 +110,16 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
                   TabBar(
                     controller: _tabController,
                     tabs: [
-                      Tab(text: widget.matchDetails.homeTeam.name),
-                      Tab(text: widget.matchDetails.awayTeam.name),
+                      Tab(
+                        text: widget.matchDetails != null
+                            ? widget.matchDetails!.homeTeam.name
+                            : widget.headToHeadDetails!.homeTeam.name,
+                      ),
+                      Tab(
+                        text: widget.matchDetails != null
+                            ? widget.matchDetails!.awayTeam.name
+                            : widget.headToHeadDetails!.awayTeam.name,
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -91,16 +128,36 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
                       controller: _tabController,
                       children: [
                         _buildTeamInnings(
-                          widget.matchDetails.homeTeam.name,
-                          widget.matchDetails.homeScore.hits.toString(),
-                          widget.matchDetails.homeScore.errors.toString(),
-                          widget.matchDetails.homeScore.innings,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeTeam.name
+                              : widget.headToHeadDetails!.homeTeam.name,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeScore.hits.toString()
+                              : widget.headToHeadDetails!.homeScore.hits
+                                  .toString(),
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeScore.errors.toString()
+                              : widget.headToHeadDetails!.homeScore.errors
+                                  .toString(),
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.homeScore.innings
+                              : widget.headToHeadDetails!.homeScore.innings,
                         ),
                         _buildTeamInnings(
-                          widget.matchDetails.awayTeam.name,
-                          widget.matchDetails.awayScore.hits.toString(),
-                          widget.matchDetails.awayScore.errors.toString(),
-                          widget.matchDetails.awayScore.innings,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayTeam.name
+                              : widget.headToHeadDetails!.awayTeam.name,
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayScore.hits.toString()
+                              : widget.headToHeadDetails!.awayScore.hits
+                                  .toString(),
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayScore.errors.toString()
+                              : widget.headToHeadDetails!.awayScore.errors
+                                  .toString(),
+                          widget.matchDetails != null
+                              ? widget.matchDetails!.awayScore.innings
+                              : widget.headToHeadDetails!.awayScore.innings,
                         ),
                       ],
                     ),
@@ -115,7 +172,6 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
   }
 
   Widget _buildTeamInfo(String teamName, String logoUrl) {
-    // Split the team name by space and get the last part
     List<String> parts = teamName.split(' ');
     String lastPart = parts.isNotEmpty ? parts.last : teamName;
 
@@ -135,12 +191,13 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
 
   Widget _buildVersusText(int? team1Score, int? team2Score) {
     return Text(
-      '$team1Score - $team2Score',
+      '${team1Score ?? 0} - ${team2Score ?? 0}',
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
     );
   }
 
-  Widget _buildTeamInnings(String teamName, String hits, String errors, Map<String, dynamic>? innings) {
+  Widget _buildTeamInnings(String teamName, String hits, String errors,
+      Map<String, dynamic>? innings) {
     if (innings == null || innings.isEmpty) {
       return Text('$teamName Innings: No data available');
     }
@@ -148,8 +205,12 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Hits: $hits', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          Text('Errors: $errors', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          Text('Hits: $hits',
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          Text('Errors: $errors',
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           ListView.builder(
             shrinkWrap: true,
@@ -163,7 +224,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
               }
               int runs = innings[inningKey] ?? 0;
               return ListTile(
-                title: Text(inningKey == 'extra' ? 'Extra ' : 'Inning $inningNumber'),
+                title: Text(
+                    inningKey == 'extra' ? 'Extra ' : 'Inning $inningNumber'),
                 subtitle: Text('Runs: $runs'),
               );
             },

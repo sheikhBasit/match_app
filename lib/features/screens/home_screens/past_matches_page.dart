@@ -44,7 +44,7 @@ class _MatchesPageState extends State<MatchesPage>
     _fetchData(); // Initial fetch
 
     // Periodic silent refresh every 30 seconds
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 300), (_) {
       _fetchData();
     });
   }

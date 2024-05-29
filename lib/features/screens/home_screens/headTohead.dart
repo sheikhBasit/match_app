@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:match_app/features/controllers/headTohead_controller.dart';
-import 'package:match_app/features/models/game_model.dart';
+import 'package:match_app/features/models/h2h_model.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
 
 class HeadToHeadPage extends StatelessWidget {
@@ -10,13 +10,12 @@ class HeadToHeadPage extends StatelessWidget {
   final String awayTeamId;
 
   HeadToHeadPage({
-    super.key,
+    Key? key,
     required this.homeTeamId,
     required this.awayTeamId,
-  });
+  }) : super(key: key);
 
-  final HeadToHeadController headToHeadController =
-      Get.put(HeadToHeadController());
+  final HeadToHeadController headToHeadController = Get.put(HeadToHeadController());
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +48,12 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildGameItem(Game matchDetails, BuildContext context) {
+  Widget _buildGameItem(HeadToHeadMatch matchDetails, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () {
-          Get.to(() => MatchDetailsPage(matchDetails: matchDetails));
+          Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
         },
         child: Center(
           child: SizedBox(
@@ -83,12 +82,9 @@ class HeadToHeadPage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildTeamInfo(matchDetails.homeTeam.name,
-                                matchDetails.homeTeam.id),
-                            _buildVersusText(matchDetails.homeScore.total ?? 0,
-                                matchDetails.awayScore.total ?? 0),
-                            _buildTeamInfo(matchDetails.awayTeam.name,
-                                matchDetails.awayTeam.id),
+                            _buildTeamInfo(matchDetails.homeTeam.name, matchDetails.homeTeam.logo),
+                            _buildVersusText(matchDetails.homeScore.total, matchDetails.awayScore.total),
+                            _buildTeamInfo(matchDetails.awayTeam.name, matchDetails.awayTeam.logo),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -96,14 +92,13 @@ class HeadToHeadPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
+                              'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(matchDetails.date))}',
                               style: const TextStyle(fontSize: 16),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: () {
-                                Get.to(() => MatchDetailsPage(
-                                    matchDetails: matchDetails));
+                                Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
                               },
                               child: const Text('Match Details'),
                             ),
@@ -122,14 +117,14 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamInfo(String teamName, int logoId) {
+  Widget _buildTeamInfo(String teamName, String logoUrl) {
     List<String> parts = teamName.split(' ');
     String lastPart = parts.isNotEmpty ? parts.last : teamName;
 
     return Column(
       children: [
-        Image.asset(
-          'assets/team_logo/$logoId.png',
+        Image.network(
+          logoUrl,
           width: 50,
           height: 50,
           fit: BoxFit.cover,
@@ -140,9 +135,9 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildVersusText(int team1Score, int team2Score) {
+  Widget _buildVersusText(int? team1Score, int? team2Score) {
     return Text(
-      '$team1Score - $team2Score',
+      '${team1Score ?? 0} - ${team2Score ?? 0}',
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
     );
   }
