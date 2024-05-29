@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:match_app/features/models/game_model.dart';
 import 'package:match_app/features/service/firestore_services.dart';
@@ -8,11 +9,25 @@ class PastMatchesController extends GetxController {
 
   var pastMatches = <Game>[].obs;
   var isLoading = false.obs;
+  Timer? _timer;
 
   @override
   void onInit() {
-    fetchPastMatches(showShimmer: true);
     super.onInit();
+    fetchPastMatches(showShimmer: true);
+    _setupTimer();
+  }
+
+  @override
+  void onClose() {
+    _timer?.cancel();
+    super.onClose();
+  }
+
+  void _setupTimer() {
+    _timer = Timer.periodic(const Duration(minutes: 30), (Timer t) async {
+      await fetchPastMatches(showShimmer: false);
+    });
   }
 
   Future<void> fetchPastMatches({required bool showShimmer}) async {
@@ -22,19 +37,25 @@ class PastMatchesController extends GetxController {
     try {
       pastMatches.clear();
       DateTime today = DateTime.now();
+      print(
+          'Fetching matches starting from: ${DateFormat('yyyy-MM-dd').format(today)}');
       for (int i = 1; i <= 9; i++) {
-        String dateStr = DateFormat('yyyy-MM-dd').format(today.subtract(Duration(days: i)));
-        // Change the return type of getGamesByDate to List<dynamic>
-        Map<String, dynamic> dayGames = await _firestoreService.getGamesByDate(dateStr);
-        // Extract the matches data from dayGames
-        List<dynamic> matchesData = dayGames['matches'] ?? [];
-        // Convert matches data to Game objects
-        List<Game> dayGamesList = matchesData.map((match) => Game.fromJson(match)).toList();
-        // Add the Game objects to upcomingMatches
+        String dateStr =
+            DateFormat('yyyy-MM-dd').format(today.subtract(Duration(days: i)));
+        print('Fetching matches for date: $dateStr');
+        Map<String, dynamic> dayGames =
+            await _firestoreService.getGamesByDate(dateStr);
+        print('Data for $dateStr: $dayGames');
+        List<dynamic> matchesData = dayGames['response'] ?? [];
+        List<Game> dayGamesList =
+            matchesData.map((match) => Game.fromJson(match)).toList();
+        print('Parsed games for $dateStr: $dayGamesList');
         pastMatches.addAll(dayGamesList);
       }
+      print('All Past matches: $pastMatches');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch Upcoming matches: $e');
+      print('Error fetching matches: $e');
+      Get.snackbar('Error', 'Failed to fetch Past matches: $e');
     } finally {
       if (showShimmer) {
         isLoading.value = false;

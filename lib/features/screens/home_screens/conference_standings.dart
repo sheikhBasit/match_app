@@ -31,11 +31,13 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
     filteredStandings = standingsController.standings
         .where((standing) =>
             standing.groupName.startsWith(widget.conference) &&
-            (selectedGroup == 'All' || standing.groupName.contains(selectedGroup)))
+            (selectedGroup == 'All' ||
+                standing.groupName.contains(selectedGroup)))
         .toList();
     // Sort the standings based on the selected group
     if (selectedGroup == 'All') {
-      filteredStandings.sort((a, b) => b.winPercentage.compareTo(a.winPercentage));
+      filteredStandings
+          .sort((a, b) => b.winPercentage.compareTo(a.winPercentage));
     } else {
       filteredStandings.sort((a, b) => a.position.compareTo(b.position));
     }
@@ -62,7 +64,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                   updateFilteredStandings(); // Update filtered standings when dropdown value changes
                 });
               },
-              items: <String>['All', 'Central', 'East', 'West'].map((String group) {
+              items: <String>['All', 'Central', 'East', 'West']
+                  .map((String group) {
                 return DropdownMenuItem<String>(
                   value: group,
                   child: Text(group),
@@ -76,49 +79,56 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     columns: <DataColumn>[
-                      if (selectedGroup != 'All') // Only show position column if not 'All'
+                      if (selectedGroup !=
+                          'All') // Only show position column if not 'All'
                         const DataColumn(
                           label: Text(
                             'Pos',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                         ),
                       const DataColumn(
                         label: Text(
                           'Team',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
                       const DataColumn(
                         label: Text(
                           'M',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
                       const DataColumn(
                         label: Text(
                           'W',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
                       const DataColumn(
                         label: Text(
                           'L',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
                       const DataColumn(
                         label: Text(
                           'PCT',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
-                      
                     ],
                     rows: filteredStandings.map((standing) {
                       return DataRow(
                         cells: [
-                          if (selectedGroup != 'All') // Only show position if not 'All'
+                          if (selectedGroup !=
+                              'All') // Only show position if not 'All'
                             DataCell(
                               Text(standing.position.toString()),
                             ),
@@ -126,40 +136,46 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                             Row(
                               children: [
                                 Image.asset(
-                                  'assets/team_logo//${standing.teamId}.png',
+                                  'assets/team_logo/${standing.teamId}.png',
                                   width: 20,
                                   height: 20,
                                   fit: BoxFit.cover,
                                 ),
                                 const SizedBox(width: 3),
                                 GestureDetector(
-                                  onTap: () => Get.to(() => StatsPage(teamStanding: standing)),
-                                  child: Text(getLastPartOfTeamName(standing.teamName)),
+                                  onTap: () => Get.to(
+                                      () => StatsPage(teamStanding: standing)),
+                                  child: Text(
+                                      getLastPartOfTeamName(standing.teamName)),
                                 ),
                               ],
                             ),
                           ),
                           DataCell(
                             GestureDetector(
-                              onTap: () => Get.to(() => StatsPage(teamStanding: standing)),
+                              onTap: () => Get.to(
+                                  () => StatsPage(teamStanding: standing)),
                               child: Text(standing.gamesPlayed.toString()),
                             ),
                           ),
                           DataCell(
                             GestureDetector(
-                              onTap: () => Get.to(() => StatsPage(teamStanding: standing)),
+                              onTap: () => Get.to(
+                                  () => StatsPage(teamStanding: standing)),
                               child: Text(standing.wins.toString()),
                             ),
                           ),
                           DataCell(
                             GestureDetector(
-                              onTap: () => Get.to(() => StatsPage(teamStanding: standing)),
+                              onTap: () => Get.to(
+                                  () => StatsPage(teamStanding: standing)),
                               child: Text(standing.losses.toString()),
                             ),
                           ),
                           DataCell(
                             GestureDetector(
-                              onTap: () => Get.to(() => StatsPage(teamStanding: standing)),
+                              onTap: () => Get.to(
+                                  () => StatsPage(teamStanding: standing)),
                               child: Text(standing.winPercentage.toString()),
                             ),
                           ),

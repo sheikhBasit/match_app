@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
@@ -31,12 +30,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> bottomBarPages = [
-      const LiveMatches(),
+      LiveMatches(),
       const MatchesPage(),
-       TournamentStandings(),
+      TournamentStandings(),
     ];
     return SafeArea(
-      bottom: false, // This ensures that content is rendered below the system's bottom navigation bar
+      bottom:
+          false, // This ensures that content is rendered below the system's bottom navigation bar
       child: Scaffold(
         appBar: AppBar(
           title: Text(appBarTitle),
@@ -52,20 +52,32 @@ class _HomePageState extends State<HomePage> {
         ), // This line ensures that the body extends behind the bottom navigation bar
         bottomNavigationBar: CurvedNavigationBar(
           index: _selectedIndex,
-          backgroundColor: const Color.fromARGB(255, 0, 36, 97),
+          backgroundColor: Colors.grey[900]!, // Dark grey color
+          color: Color.fromARGB(255, 0, 14, 119), // Color of the selected icon
+          buttonBackgroundColor:
+              Colors.grey[900], // Dark grey color for the button background
           items: [
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.explore),
-            label: 'Home',
-          ),
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.sports_baseball_rounded),
-            label: 'Schedule',
-          ),
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.query_stats),
-            label: 'Standings',
-          ),
+            const CurvedNavigationBarItem(
+              child: Icon(
+                Icons.home,
+                color: Colors.red, // Red color for the icon
+              ),
+              label: 'Home',
+            ),
+            const CurvedNavigationBarItem(
+              child: Icon(
+                Icons.sports_baseball_rounded,
+                color: Colors.red, // Red color for the icon
+              ),
+              label: 'Schedule',
+            ),
+            const CurvedNavigationBarItem(
+              child: Icon(
+                Icons.stacked_line_chart_rounded,
+                color: Colors.red, // Red color for the icon
+              ),
+              label: 'Standings',
+            ),
           ],
           onTap: (index) {
             setState(() {
@@ -81,6 +93,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   void _updateAppBarTitle(int index) {
     setState(() {
       if (index == 0) {
@@ -92,8 +105,4 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
-
-
-  }
-
-
+}
