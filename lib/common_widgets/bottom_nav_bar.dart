@@ -5,7 +5,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final ValueChanged<int> onTap;
   final int currentIndex;
 
-  const CustomBottomNavigationBar({
+  const CustomBottomNavigationBar({super.key, 
     required this.labels,
     required this.onTap,
     required this.currentIndex, 
@@ -19,8 +19,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Row(
@@ -31,7 +31,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   widget.labels[index],
                   style: TextStyle(

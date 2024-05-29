@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:match_app/features/screens/ads/banner_ad.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:wakelock/wakelock.dart';
@@ -6,7 +7,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StreamingPage extends StatefulWidget {
-  const StreamingPage({Key? key}) : super(key: key);
+  const StreamingPage({super.key});
 
   @override
   _StreamingPageState createState() => _StreamingPageState();
@@ -145,6 +146,7 @@ class _StreamingPageState extends State<StreamingPage> {
                   CircularProgressIndicator(),
                   SizedBox(height: 20),
                   Text('Streaming is being loaded'),
+                  BannerAdWidget(),
                 ],
               )
             : _isConnected
@@ -159,6 +161,7 @@ class _StreamingPageState extends State<StreamingPage> {
                             onPressed: _refresh,
                             child: const Text('Retry'),
                           ),
+                          const BannerAdWidget(), 
                         ],
                       )
                     : Chewie(controller: _chewieController!)
@@ -169,6 +172,7 @@ class _StreamingPageState extends State<StreamingPage> {
                       SizedBox(height: 20),
                       Text(
                           'No internet connection. Please check your connection and try again.'),
+                           BannerAdWidget(),
                     ],
                   ),
       ),

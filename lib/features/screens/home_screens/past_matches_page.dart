@@ -185,12 +185,12 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildTeamInfo(matchDetails.homeTeam.name, matchDetails.homeTeam.logo),
+                              _buildTeamInfo(matchDetails.homeTeam.name, matchDetails.homeTeam.id),
                               const Text(
                                 'vs',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
-                              _buildTeamInfo(matchDetails.awayTeam.name, matchDetails.awayTeam.logo),
+                              _buildTeamInfo(matchDetails.awayTeam.name, matchDetails.awayTeam.id),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -215,9 +215,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildTeamInfo(matchDetails.homeTeam.name, matchDetails.homeTeam.logo),
+                              _buildTeamInfo(matchDetails.homeTeam.name, matchDetails.homeTeam.id),
                               _buildVersusText(matchDetails.homeScore.total ?? 0, matchDetails.awayScore.total ?? 0),
-                              _buildTeamInfo(matchDetails.awayTeam.name, matchDetails.awayTeam.logo),
+                              _buildTeamInfo(matchDetails.awayTeam.name, matchDetails.awayTeam.id),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -250,14 +250,14 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTeamInfo(String teamName, String logoUrl) {
+  Widget _buildTeamInfo(String teamName, int logoId) {
     List<String> parts = teamName.split(' ');
     String lastPart = parts.isNotEmpty ? parts.last : teamName;
 
     return Column(
       children: [
-        Image.network(
-          logoUrl,
+        Image.asset(
+          'assets/team_logo/$logoId.png',
           width: 50,
           height: 50,
           fit: BoxFit.cover,

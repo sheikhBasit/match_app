@@ -1,34 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:match_app/common_widgets/match_circles.dart';
+import 'package:match_app/features/controllers/standings_controller.dart';
 import 'package:match_app/features/controllers/stats_controller.dart';
 import 'package:match_app/features/models/team_standing.dart';
+import 'package:match_app/features/screens/ads/banner_ad.dart';
 
 class StatsPage extends StatelessWidget {
   final TeamStanding teamStanding;
-  final StatsController _statsController = Get.put(StatsController());
-
-  StatsPage({required this.teamStanding});
-
-  Future<TeamStanding?> _fetchTeamStats() async {
-    await _statsController.fetchTeamStatsById(teamStanding.teamId.toString());
-    return _statsController.teamStats.value;
-  }
+  StatsPage({Key? key, required this.teamStanding}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<TeamStanding?>(
-      future: _fetchTeamStats(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return GetBuilder<StandingsController>(
+      builder: (standingsController) {
+        if (standingsController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data == null) {
+        } else if (standingsController.standings.isEmpty) {
           return const Center(child: Text('No data available'));
         }
 
-        final teamStats = snapshot.data!;
+        final teamStats = standingsController.standings.firstWhere(
+          (standing) => standing.teamId == teamStanding.teamId,
+          orElse: () => TeamStanding(
+            leagueId: teamStanding.leagueId,
+            teamId: teamStanding.teamId,
+            teamName: teamStanding.teamName,
+            teamLogo: teamStanding.teamLogo,
+            leagueName: teamStanding.leagueName,
+            leagueLogo: teamStanding.leagueLogo,
+            leagueSeason: teamStanding.leagueSeason,
+            stage: teamStanding.stage,
+            groupName: teamStanding.groupName,
+            position: 0,
+            gamesPlayed: 0,
+            wins: 0,
+            winPercentage: '0%',
+            losses: 0,
+            losePercentage: '0%',
+            pointsFor: 0,
+            pointsAgainst: 0,
+            form: '-----',
+          ), // Return empty TeamStanding if not found
+        );
 
         return SingleChildScrollView(
           child: Padding(
@@ -36,10 +50,7 @@ class StatsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Team Stats',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
+                const BannerAdWidget(),
                 const SizedBox(height: 20),
                 _buildTeamInfoCard(teamStats),
                 const SizedBox(height: 20),
@@ -60,7 +71,7 @@ class StatsPage extends StatelessWidget {
 
   Widget _buildTeamInfoCard(TeamStanding teamStanding) {
     return _buildInfoCard(
-      teamStanding.teamLogo,
+      teamStanding.teamId,
       teamStanding.teamName,
       [
         'Position: ${teamStanding.position}',
@@ -71,7 +82,7 @@ class StatsPage extends StatelessWidget {
 
   Widget _buildLeagueInfoCard(TeamStanding teamStanding) {
     return _buildInfoCard(
-      teamStanding.leagueLogo,
+      teamStanding.leagueId+99,
       teamStanding.leagueName,
       [
         'Season: ${teamStanding.leagueSeason}',
@@ -80,7 +91,7 @@ class StatsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(String logoUrl, String title, List<String> details) {
+  Widget _buildInfoCard(int teamId, String title, List<String> details) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -88,13 +99,13 @@ class StatsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            Image.network(logoUrl, width: 50, height: 50),
+            Image.asset('assets/team_logo/$teamId.png', width: 50, height: 50),
             const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                ...details.map((detail) => Text(detail)).toList(),
+                ...details.map((detail) => Text(detail)),
               ],
             ),
           ],

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MatchResultCircle extends StatelessWidget {
   final String result;
 
-  MatchResultCircle({required this.result});
+  const MatchResultCircle({super.key, required this.result});
 
   @override
   Widget build(BuildContext context) {

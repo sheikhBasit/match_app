@@ -153,7 +153,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> with SingleTickerPr
           const SizedBox(height: 10),
           ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: innings.length,
             itemBuilder: (context, index) {
               String inningNumber = (index + 1).toString();

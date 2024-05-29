@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
       home: ConnectivityBuilder(
         builder: (BuildContext context, ConnectivityStatus status) {
           if (status == ConnectivityStatus.offline) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+            WidgetsBinding.instance?.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('No internet connection.'),
@@ -56,9 +56,10 @@ class MyApp extends StatelessWidget {
           final bool isConnected = status == ConnectivityStatus.online;
           return AnimatedSplashScreen(
             duration: 3000,
-            splash: Image.asset('assets/logo/logo.png',
-            width: MediaQuery.of(context).size.width * 0.4,
-            height: MediaQuery.of(context).size.width * 0.5,
+            splash: Image.asset(
+              'assets/logo/logo.png',
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: MediaQuery.of(context).size.width * 0.8,
             ),
             nextScreen: isConnected ? const HomePage() : const NoInternetScreen(),
             splashTransition: SplashTransition.fadeTransition,

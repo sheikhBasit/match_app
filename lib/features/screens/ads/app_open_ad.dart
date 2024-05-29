@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AppOpenAdManager {
-  static const String adUnitId = 'ca-app-pub-8664324039776629/6331020652';
+  static const String adUnitId = 'ca-app-pub-8707896599237541/3183727532';
   static AppOpenAd? _appOpenAd;
   static bool _isShowingAd = false;
   static bool _adShownOnce = false; // Track if the ad has been shown at least once

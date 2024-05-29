@@ -9,7 +9,7 @@ import 'package:match_app/features/screens/home_screens/stream_page.dart';
 import 'package:shimmer/shimmer.dart';
 
 class UpcomingMatches extends StatefulWidget {
-  const UpcomingMatches({Key? key});
+  const UpcomingMatches({super.key});
 
   @override
   _UpcomingMatchesState createState() => _UpcomingMatchesState();
@@ -86,7 +86,7 @@ class _UpcomingMatchesState extends State<UpcomingMatches> with SingleTickerProv
           return SizedBox(
             height: cardHeight(context),
             child: const Center(
-              child: const Text('No upcoming matches found'),
+              child: Text('No upcoming matches found'),
             ),
           );
         }

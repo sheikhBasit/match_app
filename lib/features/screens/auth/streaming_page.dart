@@ -5,7 +5,7 @@ import 'package:wakelock/wakelock.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class StreamingPage extends StatefulWidget {
-  const StreamingPage({Key? key}) : super(key: key);
+  const StreamingPage({super.key});
 
   @override
   _StreamingPageState createState() => _StreamingPageState();

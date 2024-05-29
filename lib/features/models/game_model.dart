@@ -28,21 +28,23 @@ class Game {
   });
 
   factory Game.fromJson(Map<String, dynamic> json) {
-    return Game(
-      results: json['results'] as int,
-      id: json['id'] as int,
-      date: DateTime.parse(json['date'] as String),
-      time: json['time'] as String,
-      timestamp: json['timestamp'] as int,
-      timezone: json['timezone'] as String,
-      status: Status.fromJson(json['status'] as Map<String, dynamic>),
-      leagueName: json['league']['name'] as String,
-      homeTeam: Team.fromJson(json['teams']['home'] as Map<String, dynamic>),
-      awayTeam: Team.fromJson(json['teams']['away'] as Map<String, dynamic>),
-      homeScore: Score.fromJson(json['scores']['home'] as Map<String, dynamic>),
-      awayScore: Score.fromJson(json['scores']['away'] as Map<String, dynamic>),
-    );
-  }
+  return Game(
+    results: json['results'] as int? ?? 0,
+    id: json['id'] as int,
+    date: DateTime.parse(json['date'] as String),
+    time: json['time'] as String,
+    timestamp: json['timestamp'] as int,
+    timezone: json['timezone'] as String,
+    status: Status.fromJson(json['status'] as Map<String, dynamic>),
+    leagueName: json['league']['name'] as String,
+    homeTeam: Team.fromJson(json['teams']['home'] as Map<String, dynamic>),
+    awayTeam: Team.fromJson(json['teams']['away'] as Map<String, dynamic>),
+    homeScore: Score.fromJson(json['scores']['home'] as Map<String, dynamic>),
+    awayScore: Score.fromJson(json['scores']['away'] as Map<String, dynamic>),
+  );
+}
+
+
 }
 
 class Status {
@@ -96,13 +98,14 @@ class Score {
   });
 
   factory Score.fromJson(Map<String, dynamic> json) {
-    return Score(
-      total: json['total'] as int?,
-      hits: json['hits'] as int?,
-      errors: json['errors'] as int?,
-      innings: json['innings'] != null
-          ? Map<String, dynamic>.from(json['innings'] as Map<String, dynamic>)
-          : null,
-    );
-  }
+  return Score(
+    total: json['total'] as int?,
+    hits: json['hits'] as int?,
+    errors: json['errors'] as int?,
+    innings: json['innings'] != null
+        ? Map<String, dynamic>.from(json['innings'] as Map<String, dynamic>)
+        : null,
+  );
+}
+
 }

@@ -36,7 +36,7 @@ class HeadToHeadPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final match = controller.headToHeadMatches[index];
                   return ListTile(
-                    leading: Image.network(match.homeTeam.logo, width: 50, height: 50),
+                    leading: Image.asset('assets/team_logo/${match.homeTeam.id}', width: 50, height: 50),
                     title: Text('${match.homeTeam.name} vs ${match.awayTeam.name}'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

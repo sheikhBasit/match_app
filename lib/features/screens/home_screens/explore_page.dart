@@ -12,6 +12,8 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 
 class LiveMatches extends StatefulWidget {
+  const LiveMatches({super.key});
+
   @override
   _LiveMatchesState createState() => _LiveMatchesState();
 }
@@ -126,7 +128,7 @@ class _LiveMatchesState extends State<LiveMatches> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildTeamInfo(match.homeTeam.name, match.homeTeam.logo),
+                      _buildTeamInfo(match.homeTeam.name, match.homeTeam.id),
                       const Text(
                         'vs',
                         style: TextStyle(
@@ -135,7 +137,7 @@ class _LiveMatchesState extends State<LiveMatches> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      _buildTeamInfo(match.awayTeam.name, match.awayTeam.logo),
+                      _buildTeamInfo(match.awayTeam.name, match.awayTeam.id),
                     ],
                   ),
                   if (_isMatchInProgress(match))
@@ -193,14 +195,14 @@ class _LiveMatchesState extends State<LiveMatches> {
     }
   }
 
-  Widget _buildTeamInfo(String teamName, String logoUrl) {
+  Widget _buildTeamInfo(String teamName, int logoId) {
     List<String> parts = teamName.split(' ');
     String lastPart = parts.isNotEmpty ? parts.last : teamName;
 
     return Column(
       children: [
-        Image.network(
-          logoUrl,
+        Image.asset(
+          'assets/team_logo/$logoId.png',
           width: 50,
           height: 50,
           fit: BoxFit.cover,
@@ -210,4 +212,5 @@ class _LiveMatchesState extends State<LiveMatches> {
       ],
     );
   }
+
 }

@@ -9,6 +9,8 @@ import 'package:match_app/features/controllers/standings_controller.dart';
 class TournamentStandings extends StatelessWidget {
   final StandingsController standingsController = Get.put(StandingsController());
 
+  TournamentStandings({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +61,7 @@ class TournamentStandings extends StatelessWidget {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.8,
-                  child: TabBarView(
+                  child: const TabBarView(
                     children: [
                       ConferenceStandings(conference: 'AL'),
                       ConferenceStandings(conference: 'NL'),

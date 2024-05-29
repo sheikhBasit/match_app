@@ -8,6 +8,8 @@ import 'package:match_app/features/controllers/search_controller.dart';
 class SearchPage extends StatelessWidget {
   final SearchBarController searchController = Get.put(SearchBarController());
 
+   SearchPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +21,7 @@ class SearchPage extends StatelessWidget {
             TextField(
               decoration: InputDecoration(
                 hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -29,7 +31,7 @@ class SearchPage extends StatelessWidget {
                 searchController.filterMatches(value);
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Obx(() {
               return Expanded(
                 child: ListView.builder(

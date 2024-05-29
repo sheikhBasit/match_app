@@ -40,28 +40,54 @@ class MatchController extends GetxController {
     });
   }
 
-  Future<void> fetchTodayMatches() async {
-    if (!isAutoRefreshing.value) {
-      isLoading.value = true;
-    }
-    try {
-      final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      final todayGames = await _firestoreService.getGamesByDate(currentDate);
-      todayMatches.assignAll(todayGames);
-      saveMatchesToStorage(todayMatches);
+Future<void> fetchTodayMatches() async {
+  if (!isAutoRefreshing.value) {
+    isLoading.value = true;
+  }
+  try {
+    final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final Map<String, dynamic> todayMatchesData = await _firestoreService.getGamesByDate(currentDate);
+    final List<dynamic> matches = todayMatchesData['response']?? [];
+    
+    todayMatches.assignAll(matches.map((match) => Game.fromJson(match)).toList());
+    saveMatchesToStorage(todayMatches);
 
-      // Debug print statement to check the value
-      // print('Matches fetched at: ${DateTime.now()}');
-      // print('Number of matches: ${todayMatches.length}');
-    } catch (e) {
-      print('Error fetching matches: $e');
-      loadSavedMatches();
-    } finally {
-      if (!isAutoRefreshing.value) {
-        isLoading.value = false;
-      }
+    // Debug print statement to check the value
+    print('Matches fetched at: ${DateTime.now()}');
+    print('Number of matches: ${matches.length}');
+  } catch (e) {
+    print('Error fetching matches: $e');
+    loadSavedMatches();
+  } finally {
+    if (!isAutoRefreshing.value) {
+      isLoading.value = false;
     }
   }
+}
+
+  // Future<void> fetchTodayMatches() async {
+  //   if (!isAutoRefreshing.value) {
+  //     isLoading.value = true;
+  //   }
+  //   try {
+  //     final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  //     final todayGames = await _firestoreService.getGamesByDate(currentDate);
+  //     print('Today Games: ${todayGames}');
+  //     todayMatches.assignAll(todayGames);
+  //     saveMatchesToStorage(todayMatches);
+
+  //     // Debug print statement to check the value
+  //     print('Matches fetched at: ${DateTime.now()}');
+  //     print('Number of matches: ${todayMatches.length}');
+  //   } catch (e) {
+  //     print('Error fetching matches: $e');
+  //     loadSavedMatches();
+  //   } finally {
+  //     if (!isAutoRefreshing.value) {
+  //       isLoading.value = false;
+  //     }
+  //   }
+  // }
 
   void loadSavedMatches() {
     final dynamic savedData = storage.read("todayMatches");

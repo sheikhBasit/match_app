@@ -7,7 +7,7 @@ import 'package:match_app/features/screens/home_screens/stats_page.dart';
 class ConferenceStandings extends StatefulWidget {
   final String conference;
 
-  ConferenceStandings({required this.conference});
+  const ConferenceStandings({super.key, required this.conference});
 
   @override
   _ConferenceStandingsState createState() => _ConferenceStandingsState();
@@ -125,8 +125,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                           DataCell(
                             Row(
                               children: [
-                                Image.network(
-                                  standing.teamLogo,
+                                Image.asset(
+                                  'assets/team_logo//${standing.teamId}.png',
                                   width: 20,
                                   height: 20,
                                   fit: BoxFit.cover,
