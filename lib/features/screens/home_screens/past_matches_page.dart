@@ -230,7 +230,7 @@ class _MatchesPageState extends State<MatchesPage>
                             ],
                           ),
                           const SizedBox(height: 16),
-                          Row(
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(

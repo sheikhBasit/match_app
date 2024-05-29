@@ -4,17 +4,22 @@ import 'package:match_app/common_widgets/shimmer_effect.dart';
 import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/controllers/live_matches_controller.dart';
 import 'package:match_app/features/models/game_model.dart'; // Import Game model
+import 'package:match_app/features/screens/home_screens/headTohead.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
 import 'package:match_app/features/screens/home_screens/stream_page.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LiveMatches extends StatefulWidget {
   @override
   _LiveMatchesState createState() => _LiveMatchesState();
 }
 
+// Define the notification plugin
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 class _LiveMatchesState extends State<LiveMatches> {
   final MatchController matchController = Get.put(MatchController());
   bool _showShimmer = true;
@@ -22,7 +27,12 @@ class _LiveMatchesState extends State<LiveMatches> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(seconds: 1), () {
+    final AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    Timer(const Duration(seconds: 1), () {
       setState(() {
         _showShimmer = false;
       });
@@ -116,108 +126,111 @@ class _LiveMatchesState extends State<LiveMatches> {
   Widget _buildGameItem(BuildContext context, Game matchDetails) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: GestureDetector(
+   child: GestureDetector(
         onTap: () {
-          if (matchDetails.status.long != 'Not Started') {
-            Get.to(() => MatchDetailsPage(matchDetails: matchDetails));
-          }
-        },
-        child: Center(
-          child: SizedBox(
-            width: cardWidth(context),
-            child: Stack(
-              children: [
-                Card(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    if (matchDetails.status.short == 'NS') {
+      // Navigate to head-to-head page
+      Get.to(() => HeadToHeadPage(homeTeamId: matchDetails.homeTeam.id.toString(), awayTeamId: matchDetails.awayTeam.id.toString(),));
+    } else {
+      Get.to(() => MatchDetailsPage(matchDetails: matchDetails));
+    }
+  },
+  child: Center(
+    child: SizedBox(
+      width: cardWidth(context),
+      child: Stack(
+        children: [
+          Card(
+            elevation: 5,
+            shadowColor: Colors.grey,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        matchDetails.leagueName,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildTeamInfo(matchDetails.homeTeam.name,
+                          matchDetails.homeTeam.id),
+                      _buildStatusText(matchDetails),
+                      _buildTeamInfo(matchDetails.awayTeam.name,
+                          matchDetails.awayTeam.id),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Time: ${matchDetails.time}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  if (matchDetails.status.long != 'Finished' &&
+                      matchDetails.status.long != 'Not Started')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              matchDetails.leagueName,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigate to live stream page
+                            Get.to(() =>
+                                const StreamingPage()); // Replace with your live stream page
+                          },
+                          child: const Text('Live Stream'),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildTeamInfo(matchDetails.homeTeam.name,
-                                matchDetails.homeTeam.id),
-                            _buildStatusText(matchDetails),
-                            _buildTeamInfo(matchDetails.awayTeam.name,
-                                matchDetails.awayTeam.id),
-                          ],
+                        ElevatedButton(
+                          onPressed: () {
+                            Get.to(() => MatchDetailsPage(
+                                matchDetails: matchDetails));
+                          },
+                          child: const Text('Match Details'),
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            Text(
-                              'Time: ${matchDetails.time}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        if (matchDetails.status.long != 'Finished' &&
-                            matchDetails.status.long != 'Not Started')
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Navigate to live stream page
-                                  Get.to(() =>
-                                      StreamingPage()); // Replace with your live stream page
-                                },
-                                child: Text('Live Stream'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Get.to(() => MatchDetailsPage(
-                                      matchDetails: matchDetails));
-                                },
-                                child: Text('Match Details'),
-                              ),
-                            ],
-                          ),
                       ],
                     ),
-                  ),
-                ),
-                if (matchDetails.status.long != 'Finished' &&
-                    matchDetails.status.long != 'Not Started')
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      color: Colors.red,
-                      child: const Text(
-                        'Live',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+          if (matchDetails.status.long != 'Finished' &&
+              matchDetails.status.long != 'Not Started')
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 4),
+                color: Colors.red,
+                child: const Text(
+                  'Live',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+        ],
       ),
-    );
+    ),
+  ),
+),
+);
   }
 
   Widget _buildStatusText(Game matchDetails) {
@@ -302,5 +315,32 @@ class _LiveMatchesState extends State<LiveMatches> {
         ),
       ),
     );
+  }
+  Future<void> _showLiveMatchNotification(String leagueName, String homeTeamName, String awayTeamName) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'live_match_notification',
+      'Live Match Notification',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      styleInformation: DefaultStyleInformation(true, true),
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Live Match',
+      '$leagueName: $homeTeamName vs $awayTeamName is live now!',
+      platformChannelSpecifics,
+      payload: 'Live Match',
+    );
+  }
+
+  // Check if the match is live
+  bool _isLive(String statusShort) {
+    final liveStatuses = ['NS', 'FT', 'POST', 'CANC', 'INTR', 'ABD'];
+    return !liveStatuses.contains(statusShort);
   }
 }

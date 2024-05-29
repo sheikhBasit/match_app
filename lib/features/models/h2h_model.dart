@@ -1,14 +1,13 @@
 class HeadToHeadMatch {
-  final String id;
-  final String leagueId;
+  final int id;
+  final int leagueId;
   final String leagueName;
-  final String season;
+  final int season;
   final String statusLong;
   final String statusShort;
   final String date;
   final String time;
   final String timezone;
-  final String week;
   final Team homeTeam;
   final Team awayTeam;
   final Score homeScore;
@@ -24,7 +23,6 @@ class HeadToHeadMatch {
     required this.date,
     required this.time,
     required this.timezone,
-    required this.week,
     required this.homeTeam,
     required this.awayTeam,
     required this.homeScore,
@@ -37,22 +35,21 @@ class HeadToHeadMatch {
     }
 
     return HeadToHeadMatch(
-      id: json['id'].toString(),
-      leagueId: json['league']?['id'].toString() ?? '',
-      leagueName: json['league']?['name'] as String? ?? '',
-      season: json['league']?['season']?.toString() ?? '',
-      statusLong: json['status']?['long'] as String? ?? '',
-      statusShort: json['status']?['short'] as String? ?? '',
+      id: json['id'],
+      leagueId: json['league']['id'] ,
+      leagueName: json['league']['name'] as String? ?? '',
+      season: json['league']['season'] ?? '',
+      statusLong: json['status']['long'] as String? ?? '',
+      statusShort: json['status']['short'] as String? ?? '',
       date: json['date'] as String? ?? '',
       time: json['time'] as String? ?? '',
       timezone: json['timezone'] as String? ?? '',
-      week: json['week'] as String? ?? 'Unknown',
-      homeTeam: Team.fromJson(json['teams']!['home'] as Map<String, dynamic>),
-      awayTeam: Team.fromJson(json['teams']?['away'] as Map<String, dynamic>),
+      homeTeam: Team.fromJson(json['teams']['home'] as Map<String, dynamic>),
+      awayTeam: Team.fromJson(json['teams']['away'] as Map<String, dynamic>),
       homeScore:
-          Score.fromJson(json['scores']?['home'] as Map<String, dynamic>),
+          Score.fromJson(json['scores']['home'] as Map<String, dynamic>),
       awayScore:
-          Score.fromJson(json['scores']?['away'] as Map<String, dynamic>),
+          Score.fromJson(json['scores']['away'] as Map<String, dynamic>),
     );
   }
 }
@@ -92,7 +89,7 @@ class Score {
 
   factory Score.fromJson(Map<String, dynamic> json) {
     return Score(
-      total: json['total'] as int?,
+      total: json['total'] as int? ,
       hits: json['hits'] as int?,
       errors: json['errors'] as int?,
       innings: json['innings'] != null

@@ -68,8 +68,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
                               ? widget.matchDetails!.homeTeam.name
                               : widget.headToHeadDetails!.homeTeam.name,
                           widget.matchDetails != null
-                              ? widget.matchDetails!.homeTeam.logo
-                              : widget.headToHeadDetails!.homeTeam.logo,
+                              ? widget.matchDetails!.homeTeam.id.toString()
+                              : widget.headToHeadDetails!.homeTeam.id.toString(),
                         ),
                         _buildVersusText(
                           widget.matchDetails != null
@@ -84,8 +84,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
                               ? widget.matchDetails!.awayTeam.name
                               : widget.headToHeadDetails!.awayTeam.name,
                           widget.matchDetails != null
-                              ? widget.matchDetails!.awayTeam.logo
-                              : widget.headToHeadDetails!.awayTeam.logo,
+                              ? widget.matchDetails!.awayTeam.id.toString()
+                              : widget.headToHeadDetails!.awayTeam.id.toString(),
                         ),
                       ],
                     ),
@@ -165,27 +165,33 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
                 ],
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTeamInfo(String teamName, String logoUrl) {
+  Widget _buildTeamInfo(String teamName, String logoId) {
     List<String> parts = teamName.split(' ');
     String lastPart = parts.isNotEmpty ? parts.last : teamName;
 
-    return Column(
-      children: [
-        Image.network(
-          logoUrl,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-        ),
-        const SizedBox(height: 8),
-        Text(lastPart, style: const TextStyle(fontSize: 16)),
-      ],
+    return GestureDetector(
+      onTap: () {
+        // Navigate to team details page
+      },
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/team_logo/$logoId.png',
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+          const SizedBox(height: 8),
+          Text(lastPart, style: const TextStyle(fontSize: 16)),
+        ],
+      ),
     );
   }
 
@@ -201,36 +207,39 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
     if (innings == null || innings.isEmpty) {
       return Text('$teamName Innings: No data available');
     }
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Hits: $hits',
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          Text('Errors: $errors',
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: innings.length,
-            itemBuilder: (context, index) {
-              String inningNumber = (index + 1).toString();
-              String inningKey = inningNumber;
-              if (inningNumber == '10') {
-                inningKey = 'extra';
-              }
-              int runs = innings[inningKey] ?? 0;
-              return ListTile(
-                title: Text(
-                    inningKey == 'extra' ? 'Extra ' : 'Inning $inningNumber'),
-                subtitle: Text('Runs: $runs'),
-              );
-            },
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 16,left: 16),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Hits: $hits',
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            Text('Errors: $errors',
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: innings.length,
+              itemBuilder: (context, index) {
+                String inningNumber = (index + 1).toString();
+                String inningKey = inningNumber;
+                if (inningNumber == '10') {
+                  inningKey = 'extra';
+                }
+                int runs = innings[inningKey] ?? 0;
+                return ListTile(
+                  title: Text(
+                      inningKey == 'extra' ? 'Extra ' : 'Inning $inningNumber'),
+                  subtitle: Text('Runs: $runs'),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

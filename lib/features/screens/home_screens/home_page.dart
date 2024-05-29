@@ -3,6 +3,8 @@ import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/screens/ads/banner_ad.dart';
+import 'package:match_app/features/screens/drawer_pages/privacy_policy_page.dart';
+import 'package:match_app/features/screens/drawer_pages/terms_of_service_page.dart';
 import 'package:match_app/features/screens/home_screens/explore_page.dart';
 import 'package:match_app/features/screens/home_screens/past_matches_page.dart';
 import 'package:match_app/features/screens/home_screens/standings_page.dart';
@@ -53,25 +55,25 @@ class _HomePageState extends State<HomePage> {
         bottomNavigationBar: CurvedNavigationBar(
           index: _selectedIndex,
           backgroundColor: Colors.grey[900]!, // Dark grey color
-          color: Color.fromARGB(255, 0, 14, 119), // Color of the selected icon
+          color: Color.fromARGB(255, 36, 37, 46), // Color of the selected icon
           buttonBackgroundColor:
               Colors.grey[900], // Dark grey color for the button background
-          items: [
-            const CurvedNavigationBarItem(
+          items: const [
+            CurvedNavigationBarItem(
               child: Icon(
                 Icons.home,
-                color: Colors.red, // Red color for the icon
+                color: Color.fromARGB(255, 122, 9, 1), // Red color for the icon
               ),
               label: 'Home',
             ),
-            const CurvedNavigationBarItem(
+            CurvedNavigationBarItem(
               child: Icon(
                 Icons.sports_baseball_rounded,
                 color: Colors.red, // Red color for the icon
               ),
               label: 'Schedule',
             ),
-            const CurvedNavigationBarItem(
+            CurvedNavigationBarItem(
               child: Icon(
                 Icons.stacked_line_chart_rounded,
                 color: Colors.red, // Red color for the icon
@@ -104,5 +106,56 @@ class _HomePageState extends State<HomePage> {
         appBarTitle = 'Standings';
       }
     });
+  }
+
+
+
+
+  Widget _buildDrawerHeader() {
+    return  DrawerHeader(
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 0, 39, 71),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+     _buildDrawerItem(
+              title: 'Privacy Policy',
+              icon: Icons.privacy_tip,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PrivacyPolicyPage(),
+                  ),
+                );
+              },
+            ),
+            _buildDrawerItem(
+              title: 'Terms of Service',
+              icon: Icons.description,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TermsOfServicePage(),
+                  ),
+                );
+              },
+            ),       
+        ],
+      ),
+    );
+  }
+Widget _buildDrawerItem({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: onTap,
+    );
   }
 }

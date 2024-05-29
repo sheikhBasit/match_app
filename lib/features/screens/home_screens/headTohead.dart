@@ -9,7 +9,7 @@ class HeadToHeadPage extends StatelessWidget {
   final String homeTeamId;
   final String awayTeamId;
 
-  HeadToHeadPage({
+  HeadToHeadPage( {
     Key? key,
     required this.homeTeamId,
     required this.awayTeamId,
@@ -31,9 +31,25 @@ class HeadToHeadPage extends StatelessWidget {
             headToHeadController.fetchHeadToHeadMatches(homeTeamId, awayTeamId);
           },
           builder: (controller) {
-            if (controller.headToHeadMatches.isEmpty) {
+            if (controller.isLoading.value) {
+              // Show circular loading indicator while data is being fetched
+              return CircularProgressIndicator();
+            } else if (controller.headToHeadMatches.isEmpty) {
               return const Text('No head-to-head matches found.');
             } else {
+              // Sort matches based on status.short
+              controller.headToHeadMatches.sort((a, b) {
+                // Treat "NS" (Not Started) status as higher priority
+                if (a.statusShort == 'NS' && b.statusShort != 'NS') {
+                  return -1; // a should come before b
+                } else if (a.statusShort != 'NS' && b.statusShort == 'NS') {
+                  return 1; // b should come before a
+                } else {
+                  // For other statuses, maintain the original order
+                  return 0;
+                }
+              });
+
               return ListView.builder(
                 itemCount: controller.headToHeadMatches.length,
                 itemBuilder: (context, index) {
@@ -53,6 +69,7 @@ class HeadToHeadPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () {
+          // Navigate to match details page
           Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
         },
         child: Center(
@@ -66,45 +83,38 @@ class HeadToHeadPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          matchDetails.leagueName,
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    // Display league name
+                    Text(
+                      matchDetails.leagueName,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Column(
+                    // Display teams and scores
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildTeamInfo(matchDetails.homeTeam.name, matchDetails.homeTeam.logo),
-                            _buildVersusText(matchDetails.homeScore.total, matchDetails.awayScore.total),
-                            _buildTeamInfo(matchDetails.awayTeam.name, matchDetails.awayTeam.logo),
-                          ],
+                        _buildTeamInfo(matchDetails.homeTeam.name, int.parse(matchDetails.homeTeam.id)),
+                        _buildVersusText(matchDetails.statusShort ,matchDetails.homeScore.total, matchDetails.awayScore.total),
+                        _buildTeamInfo(matchDetails.awayTeam.name, int.parse(matchDetails.awayTeam.id)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Display match date and button to view details
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(matchDetails.date))}',
+                          style: const TextStyle(fontSize: 16),
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(matchDetails.date))}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const SizedBox(width: 8),
-                            ElevatedButton(
-                              onPressed: () {
-                                Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
-                              },
-                              child: const Text('Match Details'),
-                            ),
-                          ],
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigate to match details page
+                            Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
+                          },
+                          child: const Text('Match Details'),
                         ),
-                        const SizedBox(height: 16),
                       ],
                     ),
                   ],
@@ -117,14 +127,14 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamInfo(String teamName, String logoUrl) {
+  Widget _buildTeamInfo(String teamName, int logoId) {
     List<String> parts = teamName.split(' ');
     String lastPart = parts.isNotEmpty ? parts.last : teamName;
 
     return Column(
       children: [
-        Image.network(
-          logoUrl,
+        Image.asset(
+          'assets/team_logo/$logoId.png',
           width: 50,
           height: 50,
           fit: BoxFit.cover,
@@ -135,12 +145,29 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildVersusText(int? team1Score, int? team2Score) {
+  Widget _buildVersusText(String statusShort, int? team1Score, int? team2Score) {
+  if (statusShort == 'NS') {
     return Text(
-      '${team1Score ?? 0} - ${team2Score ?? 0}',
+      'vs',
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
     );
+  } else {
+    // Check if team1Score and team2Score are not null before rendering scores
+    if (team1Score != null && team2Score != null) {
+      return Text(
+        '$team1Score - $team2Score',
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      );
+    } else {
+      // Handle null scores
+      return Text(
+        '0 - 0', // Or any default value you prefer
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      );
+    }
   }
+}
+
 
   double cardWidth(BuildContext context) {
     return MediaQuery.of(context).size.width * 0.9;

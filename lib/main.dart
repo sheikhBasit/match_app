@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
       home: ConnectivityBuilder(
         builder: (BuildContext context, ConnectivityStatus status) {
           if (status == ConnectivityStatus.offline) {
-            WidgetsBinding.instance?.addPostFrameCallback((_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('No internet connection.'),
