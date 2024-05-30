@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:match_app/features/screens/ads/interstitial_ad.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class StreamingPage extends StatefulWidget {
   const StreamingPage({Key? key}) : super(key: key);
@@ -66,8 +65,8 @@ class _StreamingPageState extends State<StreamingPage> {
 
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('VideoDetails')
-          .doc('ZmxTvS2XmfwQ35SBqwOw')
+          .collection('live_stream')
+          .doc('default')
           .get();
 
       if (snapshot.exists) {
