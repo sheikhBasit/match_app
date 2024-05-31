@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:match_app/common_widgets/match_circles.dart';
+import 'package:match_app/common_widgets/user_subscription.dart';
 import 'package:match_app/features/controllers/standings_controller.dart';
 import 'package:match_app/features/models/team_standing.dart';
 import 'package:match_app/features/screens/ads/banner_ad.dart';
@@ -60,7 +61,7 @@ class StatsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(child: BannerAdWidget()),
+                    if (!UserSubscription.isSubscribed) const Center(child: BannerAdWidget()),
                     const SizedBox(height: 20),
                     _buildTeamInfoCard(teamStats),
                     const SizedBox(height: 20),

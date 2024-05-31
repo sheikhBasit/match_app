@@ -163,6 +163,7 @@ class _MatchesPageState extends State<MatchesPage>
           child: SizedBox(
             width: cardWidth(context),
             child: Card(
+              color: cardBackgroundColor(context),
               elevation: 5,
               shadowColor: Colors.grey,
               child: Padding(
@@ -175,9 +176,9 @@ class _MatchesPageState extends State<MatchesPage>
                       children: [
                         Text(
                           matchDetails.leagueName,
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
+                           style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -191,9 +192,9 @@ class _MatchesPageState extends State<MatchesPage>
                                   matchDetails.homeTeam.id),
                               const Text(
                                 'vs',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
+                                style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            ),
                               _buildTeamInfo(matchDetails.awayTeam.name,
                                   matchDetails.awayTeam.id),
                             ],
@@ -204,12 +205,15 @@ class _MatchesPageState extends State<MatchesPage>
                             children: [
                               Text(
                                 'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
-                                style: const TextStyle(fontSize: 16),
-                              ),
+                                style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            ),
                               Text(
                                 'Time: ${matchDetails.time}',
-                                style: const TextStyle(fontSize: 16),
-                              ),
+                                style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            ),
+                              
                             ],
                           ),
                         ],
@@ -233,10 +237,6 @@ class _MatchesPageState extends State<MatchesPage>
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
-                                style: const TextStyle(fontSize: 16),
-                              ),
                               const SizedBox(height: 8),
                               ElevatedButton(
                                 onPressed: () {
@@ -273,7 +273,9 @@ class _MatchesPageState extends State<MatchesPage>
           fit: BoxFit.cover,
         ),
         const SizedBox(height: 8),
-        Text(lastPart, style: const TextStyle(fontSize: 16)),
+        Text(lastPart, style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            ),
       ],
     );
   }
@@ -281,7 +283,8 @@ class _MatchesPageState extends State<MatchesPage>
   Widget _buildVersusText(int team1Score, int team2Score) {
     return Text(
       '$team1Score - $team2Score',
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      style:  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            
     );
   }
 

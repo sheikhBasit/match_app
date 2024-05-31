@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/controllers/headTohead_controller.dart';
 import 'package:match_app/features/models/h2h_model.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
@@ -21,7 +22,7 @@ class HeadToHeadPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Head-to-Head Matches'),
+        title: const Text('Encounters'),
       ),
       body: Center(
         child: GetBuilder<HeadToHeadController>(
@@ -76,6 +77,7 @@ class HeadToHeadPage extends StatelessWidget {
           child: SizedBox(
             width: cardWidth(context),
             child: Card(
+              color: cardBackgroundColor(context),
               elevation: 5,
               shadowColor: Colors.grey,
               child: Padding(
@@ -86,7 +88,8 @@ class HeadToHeadPage extends StatelessWidget {
                     // Display league name
                     Text(
                       matchDetails.leagueName,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
                     ),
                     const SizedBox(height: 8),
                     // Display teams and scores
@@ -105,7 +108,9 @@ class HeadToHeadPage extends StatelessWidget {
                       children: [
                         Text(
                           'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(matchDetails.date))}',
-                          style: const TextStyle(fontSize: 16),
+                          style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
@@ -140,29 +145,37 @@ class HeadToHeadPage extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         const SizedBox(height: 8),
-        Text(lastPart, style: const TextStyle(fontSize: 16)),
+        Text(lastPart, style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            ),
       ],
     );
   }
 
   Widget _buildVersusText(String statusShort, int? team1Score, int? team2Score) {
   if (statusShort == 'NS') {
-    return Text(
+    return const Text(
       'vs',
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      style:  TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            
     );
   } else {
     // Check if team1Score and team2Score are not null before rendering scores
     if (team1Score != null && team2Score != null) {
       return Text(
         '$team1Score - $team2Score',
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            
       );
     } else {
       // Handle null scores
       return Text(
         '0 - 0', // Or any default value you prefer
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+ style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                            
       );
     }
   }

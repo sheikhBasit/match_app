@@ -1,23 +1,25 @@
-// ignore_for_file: prefer_function_declarations_over_variables
-
 import 'package:flutter/material.dart';
 
-const cardBackgroundColor = Color(0xFF21222D);
-const primaryColor = Color(0xFF2697FF);
+const primaryColor = Color(0xFF0C2F59);
 const secondaryColor = Color(0xFFFFFFFF);
+const selectionColor = Color(0xFFB72751);
 const backgroundColor = Color(0xFF15131C);
-const selectionColor = Color(0xFF88B2AC);
+
+Color cardBackgroundColor(BuildContext context) {
+  final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+  return isDarkTheme ? Color(0xFF0C2F59) : Color(0xFFB72751);
+}
 
 const defaultPadding = 20.0;
-final cardWidth = (context) {
+
+double cardWidth(BuildContext context) {
   return MediaQuery.of(context).size.width * 0.9;
-};
+}
 
-final cardHeight = (context) {
-  return MediaQuery.of(context).size.height * 0.9 ;
-};
+double cardHeight(BuildContext context) {
+  return MediaQuery.of(context).size.height * 0.9;
+}
 
-final navBarWidth = (context) {
+double navBarWidth(BuildContext context) {
   return MediaQuery.of(context).size.width * 1;
-};
-
+}
