@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                 children: bottomBarPages,
               ),
             ),
-            if (!UserSubscription.isSubscribed) const BannerAdWidget(),
+             const BannerAdWidget(),
           ],
         ),
         bottomNavigationBar: CurvedNavigationBar(

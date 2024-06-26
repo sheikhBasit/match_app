@@ -213,16 +213,14 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
                               Text(
                                 'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
                                 style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                   color: secondaryColor,
                                 ),
                               ),
                               Text(
                                 'Time: ${matchDetails.time}',
                                 style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                   color: secondaryColor,
                                 ),
                               ),

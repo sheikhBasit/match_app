@@ -8,7 +8,8 @@
 
         <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-8707896599237541~7245126002"/>
+        android:value="ca-app-pub-8664324039776629~4945786795"/>
+        <!--   ca-app-pub-8707896599237541~7245126002 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

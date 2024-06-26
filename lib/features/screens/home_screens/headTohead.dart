@@ -109,19 +109,25 @@ class HeadToHeadPage extends StatelessWidget {
                         Text(
                           'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(matchDetails.date))}',
                           style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                                  fontSize: 16, color: secondaryColor),
                             
                         ),
                         const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Navigate to match details page
-                            Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
-                          },
-                          child: const Text('Match Details'),
-                        ),
                       ],
+
                     ),
+                        const SizedBox(height: 8),
+                    
+                      Center(
+                        child: ElevatedButton(
+                            onPressed: () {
+                              // Navigate to match details page
+                              Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
+                            },
+                            child: const Text('Match Details'),
+                          ),
+                      ),
+                      
                   ],
                 ),
               ),

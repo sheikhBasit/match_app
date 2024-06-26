@@ -28,6 +28,7 @@ void main() async {
   Get.put(NotificationController());
   await MobileAds.instance.initialize();
   AppOpenAdManager.loadAppOpenAd();
+  
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -49,13 +50,31 @@ class MyApp extends StatelessWidget {
           initialBinding: MainBindings(), // Set the initial binding here
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
-            primaryColor: Color.fromARGB(255, 8, 4, 66),
+            primaryColor: const Color.fromRGBO(183, 39, 81, 1),
             brightness: Brightness.light,
+            colorScheme: const ColorScheme.light(
+              primary: Color.fromRGBO(183, 39, 81, 1),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color.fromRGBO(183, 39, 81, 1),
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Color.fromRGBO(183, 39, 81, 1),
+            ),
           ),
           darkTheme: ThemeData(
             scaffoldBackgroundColor: backgroundColor,
             primaryColor: const Color.fromRGBO(183, 39, 81, 1),
             brightness: Brightness.dark,
+            colorScheme: const ColorScheme.dark(
+              primary: Color.fromRGBO(183, 39, 81, 1),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color.fromRGBO(183, 39, 81, 1),
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Color.fromRGBO(183, 39, 81, 1),
+            ),
           ),
           themeMode: themeProvider.currentTheme,
           home: ConnectivityBuilder(
