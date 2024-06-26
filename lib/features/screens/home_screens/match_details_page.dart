@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:match_app/features/models/game_model.dart';
 import 'package:match_app/features/models/h2h_model.dart'; // Ensure this import for HeadToHeadMatch
 import 'package:intl/intl.dart';
+
+import '../ads/interstitial_ad.dart';
 
 class MatchDetailsPage extends StatefulWidget {
   final Game? matchDetails;
@@ -20,19 +24,33 @@ class MatchDetailsPage extends StatefulWidget {
 class _MatchDetailsPageState extends State<MatchDetailsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
+  Timer? _adTimer;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    // Load the interstitial ad when the page is initialized
+    InterstitialAdManager.loadAd();
+
+    // Set up a timer to show the ad after 10 seconds
+    _adTimer = Timer(const Duration(seconds: 10), () {
+      InterstitialAdManager.showAd();
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+
+    // Cancel the timer to avoid memory leaks
+    _adTimer?.cancel();
+
+    // Ensure any active ads are disposed of
+    InterstitialAdManager.disposeAd();
+
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

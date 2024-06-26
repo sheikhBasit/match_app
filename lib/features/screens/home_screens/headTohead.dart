@@ -1,3 +1,5 @@
+import 'dart:async'; // Import the dart:async package for Timer
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -5,18 +7,52 @@ import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/controllers/headTohead_controller.dart';
 import 'package:match_app/features/models/h2h_model.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
+import '../ads/interstitial_ad.dart'; // Import your InterstitialAdManager
 
-class HeadToHeadPage extends StatelessWidget {
+class HeadToHeadPage extends StatefulWidget {
   final String homeTeamId;
   final String awayTeamId;
 
-  HeadToHeadPage( {
+  const HeadToHeadPage({
     Key? key,
     required this.homeTeamId,
     required this.awayTeamId,
   }) : super(key: key);
 
+  @override
+  _HeadToHeadPageState createState() => _HeadToHeadPageState();
+}
+
+class _HeadToHeadPageState extends State<HeadToHeadPage> {
   final HeadToHeadController headToHeadController = Get.find<HeadToHeadController>();
+  Timer? _adTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Load the interstitial ad when the page is initialized
+    InterstitialAdManager.loadAd();
+
+    // Set up a timer to show the ad after 10 seconds
+    _adTimer = Timer(const Duration(seconds: 10), () {
+      InterstitialAdManager.showAd();
+    });
+
+    // Fetch head-to-head matches when the view initializes
+    headToHeadController.fetchHeadToHeadMatches(widget.homeTeamId, widget.awayTeamId);
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer to avoid memory leaks
+    _adTimer?.cancel();
+
+    // Ensure any active ads are disposed of
+    InterstitialAdManager.disposeAd();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,41 +61,40 @@ class HeadToHeadPage extends StatelessWidget {
         title: const Text('Encounters'),
       ),
       body: Center(
-        child: GetBuilder<HeadToHeadController>(
-          init: headToHeadController,
-          initState: (_) {
-            // Fetch head-to-head matches when the view initializes
-            headToHeadController.fetchHeadToHeadMatches(homeTeamId, awayTeamId);
-          },
-          builder: (controller) {
-            if (controller.isLoading.value) {
-              // Show circular loading indicator while data is being fetched
-              return CircularProgressIndicator();
-            } else if (controller.headToHeadMatches.isEmpty) {
-              return const Text('No head-to-head matches found.');
-            } else {
-              // Sort matches based on status.short
-              controller.headToHeadMatches.sort((a, b) {
-                // Treat "NS" (Not Started) status as higher priority
-                if (a.statusShort == 'NS' && b.statusShort != 'NS') {
-                  return -1; // a should come before b
-                } else if (a.statusShort != 'NS' && b.statusShort == 'NS') {
-                  return 1; // b should come before a
-                } else {
-                  // For other statuses, maintain the original order
-                  return 0;
-                }
-              });
-
-              return ListView.builder(
-                itemCount: controller.headToHeadMatches.length,
-                itemBuilder: (context, index) {
-                  final match = controller.headToHeadMatches[index];
-                  return _buildGameItem(match, context);
-                },
-              );
-            }
-          },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GetBuilder<HeadToHeadController>(
+            init: headToHeadController,
+            builder: (controller) {
+              if (controller.isLoading.value) {
+                // Show circular loading indicator while data is being fetched
+                return CircularProgressIndicator();
+              } else if (controller.headToHeadMatches.isEmpty) {
+                return const Text('No head-to-head matches found.');
+              } else {
+                // Sort matches based on status.short
+                controller.headToHeadMatches.sort((a, b) {
+                  // Treat "NS" (Not Started) status as higher priority
+                  if (a.statusShort == 'NS' && b.statusShort != 'NS') {
+                    return -1; // a should come before b
+                  } else if (a.statusShort != 'NS' && b.statusShort == 'NS') {
+                    return 1; // b should come before a
+                  } else {
+                    // For other statuses, maintain the original order
+                    return 0;
+                  }
+                });
+          
+                return ListView.builder(
+                  itemCount: controller.headToHeadMatches.length,
+                  itemBuilder: (context, index) {
+                    final match = controller.headToHeadMatches[index];
+                    return _buildGameItem(match, context);
+                  },
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -89,7 +124,7 @@ class HeadToHeadPage extends StatelessWidget {
                     Text(
                       matchDetails.leagueName,
                       style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                        fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
                     ),
                     const SizedBox(height: 8),
                     // Display teams and scores
@@ -109,25 +144,21 @@ class HeadToHeadPage extends StatelessWidget {
                         Text(
                           'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(matchDetails.date))}',
                           style: const TextStyle(
-                                  fontSize: 16, color: secondaryColor),
-                            
+                            fontSize: 16, color: secondaryColor),
                         ),
                         const SizedBox(width: 8),
                       ],
-
                     ),
-                        const SizedBox(height: 8),
-                    
-                      Center(
-                        child: ElevatedButton(
-                            onPressed: () {
-                              // Navigate to match details page
-                              Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
-                            },
-                            child: const Text('Match Details'),
-                          ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Navigate to match details page
+                          Get.to(() => MatchDetailsPage(headToHeadDetails: matchDetails));
+                        },
+                        child: const Text('Match Details'),
                       ),
-                      
+                    ),
                   ],
                 ),
               ),
@@ -152,43 +183,40 @@ class HeadToHeadPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(lastPart, style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
-                            ),
+          fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+        ),
       ],
     );
   }
 
   Widget _buildVersusText(String statusShort, int? team1Score, int? team2Score) {
-  if (statusShort == 'NS') {
-    return const Text(
-      'vs',
-      style:  TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
-                            
-    );
-  } else {
-    // Check if team1Score and team2Score are not null before rendering scores
-    if (team1Score != null && team2Score != null) {
-      return Text(
-        '$team1Score - $team2Score',
-        style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
-                            
+    if (statusShort == 'NS') {
+      return const Text(
+        'vs',
+        style: TextStyle(
+          fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
       );
     } else {
-      // Handle null scores
-      return Text(
-        '0 - 0', // Or any default value you prefer
- style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
-                            
-      );
+      // Check if team1Score and team2Score are not null before rendering scores
+      if (team1Score != null && team2Score != null) {
+        return Text(
+          '$team1Score - $team2Score',
+          style: const TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+        );
+      } else {
+        // Handle null scores
+        return Text(
+          '0 - 0', // Or any default value you prefer
+          style: const TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+        );
+      }
     }
   }
-}
-
 
   double cardWidth(BuildContext context) {
     return MediaQuery.of(context).size.width * 0.9;
   }
 }
+

@@ -49,11 +49,15 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: Text(
             appBarTitle,
-            style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color.fromARGB(255, 240, 240, 240)
-                      : Colors.black,
-                ),
+            
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 240, 240, 240)
+                  : Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            ),
+
           ),
           actions: [
             IconButton(

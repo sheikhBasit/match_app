@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:match_app/common_widgets/match_circles.dart';
@@ -5,11 +7,42 @@ import 'package:match_app/common_widgets/user_subscription.dart';
 import 'package:match_app/features/controllers/standings_controller.dart';
 import 'package:match_app/features/models/team_standing.dart';
 import 'package:match_app/features/screens/ads/banner_ad.dart';
+import 'package:match_app/features/screens/ads/interstitial_ad.dart';
 
-class StatsPage extends StatelessWidget {
+class StatsPage extends StatefulWidget {
   final TeamStanding teamStanding;
   StatsPage({Key? key, required this.teamStanding}) : super(key: key);
 
+  @override
+  State<StatsPage> createState() => _StatsPageState();
+}
+
+class _StatsPageState extends State<StatsPage> {
+   Timer? _adTimer;
+@override
+  void initState() {
+    super.initState();
+
+    // Load the interstitial ad when the page is initialized
+    InterstitialAdManager.loadAd();
+
+    // Set up a timer to show the ad after 10 seconds
+    _adTimer = Timer(const Duration(seconds: 10), () {
+      InterstitialAdManager.showAd();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer to avoid memory leaks
+    _adTimer?.cancel();
+
+    // Ensure any active ads are disposed of
+    InterstitialAdManager.disposeAd();
+
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,17 +65,17 @@ class StatsPage extends StatelessWidget {
             }
 
             final teamStats = standingsController.standings.firstWhere(
-              (standing) => standing.teamId == teamStanding.teamId,
+              (standing) => standing.teamId == widget.teamStanding.teamId,
               orElse: () => TeamStanding(
-                leagueId: teamStanding.leagueId,
-                teamId: teamStanding.teamId,
-                teamName: teamStanding.teamName,
-                teamLogo: teamStanding.teamLogo,
-                leagueName: teamStanding.leagueName,
-                leagueLogo: teamStanding.leagueLogo,
-                leagueSeason: teamStanding.leagueSeason,
-                stage: teamStanding.stage,
-                groupName: teamStanding.groupName,
+                leagueId: widget.teamStanding.leagueId,
+                teamId: widget.teamStanding.teamId,
+                teamName: widget.teamStanding.teamName,
+                teamLogo: widget.teamStanding.teamLogo,
+                leagueName: widget.teamStanding.leagueName,
+                leagueLogo: widget.teamStanding.leagueLogo,
+                leagueSeason: widget.teamStanding.leagueSeason,
+                stage: widget.teamStanding.stage,
+                groupName: widget.teamStanding.groupName,
                 position: 0,
                 gamesPlayed: 0,
                 wins: 0,

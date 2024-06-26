@@ -1,12 +1,11 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class InterstitialAdManager {
   static InterstitialAd? _interstitialAd;
 
-  // static const adUnitId = 'ca-app-pub-8707896599237541/1354273566';
   static const adUnitId = 'ca-app-pub-8664324039776629/8998961301';
+  
   static void loadAd() {
     InterstitialAd.load(
       adUnitId: adUnitId,
@@ -44,6 +43,11 @@ class InterstitialAdManager {
     );
 
     _interstitialAd!.show();
+    _interstitialAd = null;
+  }
+
+  static void disposeAd() {
+    _interstitialAd?.dispose();
     _interstitialAd = null;
   }
 }

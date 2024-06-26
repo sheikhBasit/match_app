@@ -1,16 +1,49 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:match_app/features/models/team_standing.dart';
+import 'package:match_app/features/screens/ads/interstitial_ad.dart';
 import 'package:match_app/features/screens/home_screens/conference_standings.dart';
 import 'package:match_app/features/controllers/standings_controller.dart';
 
-class TournamentStandings extends StatelessWidget {
-  final StandingsController standingsController = Get.find<StandingsController>();
+class TournamentStandings extends StatefulWidget {
 
   TournamentStandings({super.key});
 
+  @override
+  State<TournamentStandings> createState() => _TournamentStandingsState();
+}
+
+class _TournamentStandingsState extends State<TournamentStandings> {
+  final StandingsController standingsController = Get.find<StandingsController>();
+ Timer? _adTimer;
+@override
+  void initState() {
+    super.initState();
+
+    // Load the interstitial ad when the page is initialized
+    InterstitialAdManager.loadAd();
+
+    // Set up a timer to show the ad after 10 seconds
+    _adTimer = Timer(const Duration(seconds: 10), () {
+      InterstitialAdManager.showAd();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer to avoid memory leaks
+    _adTimer?.cancel();
+
+    // Ensure any active ads are disposed of
+    InterstitialAdManager.disposeAd();
+
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +114,6 @@ class TournamentStandings extends StatelessWidget {
       ),
     );
   }
-
 
   Future<void> _refreshStandings() async {
     // Check connectivity
