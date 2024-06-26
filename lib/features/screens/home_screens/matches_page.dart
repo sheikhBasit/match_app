@@ -1,204 +1,328 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:match_app/common_widgets/shimmer_effect.dart';
-// import 'package:match_app/constants/constants.dart';
-// import 'package:match_app/features/controllers/upcoming_matches_controller.dart'; // Import UpcomingMatchesController
-// import 'package:match_app/features/models/game_model.dart';
-// import 'package:match_app/features/screens/home_screens/match_details_page.dart';
-// import 'package:match_app/features/screens/home_screens/stream_page.dart';
-// import 'package:shimmer/shimmer.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:match_app/common_widgets/shimmer_effect.dart';
+import 'package:match_app/constants/constants.dart';
+import 'package:match_app/features/controllers/past_matches_controller.dart';
+import 'package:match_app/features/controllers/upcoming_matches_controller.dart';
+import 'package:match_app/features/models/game_model.dart';
+import 'package:match_app/features/screens/home_screens/headTohead.dart';
+import 'package:match_app/features/screens/home_screens/match_details_page.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
 
-// class UpcomingMatches extends StatefulWidget {
-//   const UpcomingMatches({super.key});
+class MatchesPage extends StatefulWidget {
+  const MatchesPage({super.key});
 
-//   @override
-//   _UpcomingMatchesState createState() => _UpcomingMatchesState();
-// }
+  @override
+  State<MatchesPage> createState() => _MatchesPageState();
+}
 
-// class _UpcomingMatchesState extends State<UpcomingMatches> with SingleTickerProviderStateMixin {
-//   final UpcomingMatchesController matchController = Get.put(UpcomingMatchesController()); // Use UpcomingMatchesController
-//   late ScrollController _scrollController;
-//   late AnimationController _controller;
-//   late Animation<double> _animation;
+class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStateMixin {
+  final PastMatchesController pastMatchesController = Get.find<PastMatchesController>();
+  final UpcomingMatchesController upcomingMatchesController = Get.find<UpcomingMatchesController>();
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _scrollController = ScrollController();
-//     // Initialize AnimationController
-//     _controller = AnimationController(
-//       vsync: this,
-//       duration: const Duration(seconds: 1),
-//     );
-//     // Initialize Animation
-//     _animation = Tween<double>(begin: 0, end: 50).animate(
-//       CurvedAnimation(
-//         parent: _controller,
-//         curve: Curves.easeInOut,
-//       ),
-//     );
-//   }
+  late TabController _tabController;
+  late Timer? _timer; // Make the Timer nullable
 
-//   @override
-//   void dispose() {
-//     _scrollController.dispose();
-//     // Dispose AnimationController
-//     _controller.dispose();
-//     super.dispose();
-//   }
+  bool _showShimmer = true;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Obx(() {
-//       if (matchController.isLoading.value) {
-//         // Loading state
-//         return SizedBox(
-//           height: cardHeight(context),
-//           child: Shimmer.fromColors(
-//             baseColor: Colors.grey,
-//             highlightColor: Colors.grey[600]!,
-//             child: Column(
-//               children: List.generate(
-//                 2,
-//                 (index) => const Padding(
-//                   padding: EdgeInsets.only(bottom: 12.0),
-//                   child: ShimmerEffect(),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         );
-//       } else {
-//         // Data loaded
-//         if (matchController.upcomingMatches.isNotEmpty) {
-//           return SingleChildScrollView(
-//             padding: const EdgeInsets.all(16),
-//             controller: _scrollController,
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 _buildMatchList(matchController.upcomingMatches),
-//               ],
-//             ),
-//           );
-//         } else {
-//           // No matches found
-//           return SizedBox(
-//             height: cardHeight(context),
-//             child: const Center(
-//               child: Text('No upcoming matches found'),
-//             ),
-//           );
-//         }
-//       }
-//     });
-//   }
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
 
-//   Widget _buildMatchList(List<Game> matchList) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: List.generate(matchList.length, (index) {
-//         return _buildMatchCard(matchList[index]);
-//       }),
-//     );
-//   }
+    Timer(const Duration(seconds: 1), () {
+      if (mounted) { // Check if the widget is still mounted before setState
+        setState(() {
+          _showShimmer = false;
+        });
+      }
+    });
 
-//   Widget _buildMatchCard(Game matchDetails) {
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 12.0),
-//       child: GestureDetector(
-//         onTap: () {
-//           Get.to(MatchDetailsPage(matchDetails: matchDetails));
-//         },
-//         child: Center(
-//           child: SizedBox(
-//             width: cardWidth(context),
-//             child: Card(
-//               elevation: 5,
-//               shadowColor: Colors.grey,
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         Text(
-//                           matchDetails.leagueName,
-//                           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-//                         ),
-//                         // Animated bar for the "Live" text
-//                         Column(
-//                           children: [
-//                             const Text('Live', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-//                             AnimatedBuilder(
-//                               animation: _animation,
-//                               builder: (context, child) {
-//                                 return Container(
-//                                   width: _animation.value,
-//                                   height: 4,
-//                                   color: Colors.red, // Customize color as needed
-//                                 );
-//                               },
-//                             ),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                     const SizedBox(height: 8),
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         _buildTeamInfo(matchDetails.homeTeam.name),
-//                         _buildVersusText(matchDetails.homeScore.total!, matchDetails.awayScore.total!),
-//                         _buildTeamInfo(matchDetails.awayTeam.name),
-//                       ],
-//                     ),
-//                     const SizedBox(height: 16,),
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//                         ElevatedButton(
-//                           onPressed: () {
-//                             Get.to(MatchDetailsPage(matchDetails: matchDetails));
-//                           },
-//                           child: const Text('Match Details'),
-//                         ),
-//                         const SizedBox(width: 16),
-//                         ElevatedButton(
-//                           onPressed: () {
-//                             Get.to(const StreamingPage());
-//                           },
-//                           child: const Text('Live Stream'),
-//                         ),
-//                       ],
-//                     ),
-//                     const SizedBox(height: 20),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
+    _fetchData(); // Initial fetch
 
-//   Widget _buildTeamInfo(String teamName) {
-//     return Column(
-//       children: [
-//         const Icon(Icons.sports_basketball, size: 50, color: Colors.blue),
-//         const SizedBox(height: 8),
-//         Text(teamName, style: const TextStyle(fontSize: 16)),
-//       ],
-//     );
-//   }
+    // Periodic silent refresh every 5 minutes
+    _timer = Timer.periodic(const Duration(minutes: 5), (_) {
+      _fetchData();
+    });
+  }
 
-//   Widget _buildVersusText(int team1Score, int team2Score) {
-//     return Text(
-//       '$team1Score - $team2Score',
-//       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//     );
-//   }
-// }
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _timer?.cancel(); // Cancel the timer if it's not null
+    super.dispose();
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      _fetchData();
+    }
+  }
+
+  void _fetchData() {
+    if (_tabController.index == 0) {
+      upcomingMatchesController.fetchUpcomingMatches(showShimmer: false);
+    } else {
+      pastMatchesController.fetchPastMatches(showShimmer: false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                TabBar(
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(text: "Upcoming Matches"),
+                    Tab(text: "Past Matches"),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildUpcomingMatches(context),
+                      _buildPastMatches(context),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpcomingMatches(BuildContext context) {
+    return Obx(() {
+      return RefreshIndicator(
+        onRefresh: () async {
+          await upcomingMatchesController.fetchUpcomingMatches(showShimmer: false);
+        },
+        child: _showShimmer && upcomingMatchesController.upcomingMatches.isEmpty
+            ? _buildShimmerListView(context)
+            : ListView.builder(
+                itemCount: upcomingMatchesController.upcomingMatches.length,
+                itemBuilder: (context, index) {
+                  final game = upcomingMatchesController.upcomingMatches[index];
+                  return _buildGameItem(game, 'Upcoming');
+                },
+              ),
+      );
+    });
+  }
+
+  Widget _buildPastMatches(BuildContext context) {
+    return Obx(() {
+      return RefreshIndicator(
+        onRefresh: () async {
+          await pastMatchesController.fetchPastMatches(showShimmer: false);
+        },
+        child: _showShimmer && pastMatchesController.pastMatches.isEmpty
+            ? _buildShimmerListView(context)
+            : ListView.builder(
+                itemCount: pastMatchesController.pastMatches.length,
+                itemBuilder: (context, index) {
+                  final game = pastMatchesController.pastMatches[index];
+                  return _buildGameItem(game, 'Past');
+                },
+              ),
+      );
+    });
+  }
+
+  Widget _buildGameItem(Game matchDetails, String status) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: GestureDetector(
+        onTap: () {
+          if (status == 'Upcoming') {
+            Get.to(() => HeadToHeadPage(
+                  homeTeamId: matchDetails.homeTeam.id.toString(),
+                  awayTeamId: matchDetails.awayTeam.id.toString(),
+                ));
+          } else if (status == 'Past') {
+            Get.to(() => MatchDetailsPage(matchDetails: matchDetails));
+          }
+        },
+        child: Center(
+          child: SizedBox(
+            width: cardWidth(context),
+            child: Card(
+              color: cardBackgroundColor(context),
+              elevation: 5,
+              shadowColor: Colors.grey,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          matchDetails.leagueName,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: secondaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (status == 'Upcoming')
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildTeamInfo(
+                                  matchDetails.homeTeam.name,
+                                  matchDetails.homeTeam.id),
+                              const Text(
+                                'vs',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: secondaryColor,
+                                ),
+                              ),
+                              _buildTeamInfo(
+                                  matchDetails.awayTeam.name,
+                                  matchDetails.awayTeam.id),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: secondaryColor,
+                                ),
+                              ),
+                              Text(
+                                'Time: ${matchDetails.time}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: secondaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    if (status == 'Past')
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildTeamInfo(
+                                  matchDetails.homeTeam.name,
+                                  matchDetails.homeTeam.id),
+                              _buildVersusText(
+                                  matchDetails.homeScore.total ?? 0,
+                                  matchDetails.awayScore.total ?? 0),
+                              _buildTeamInfo(
+                                  matchDetails.awayTeam.name,
+                                  matchDetails.awayTeam.id),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Get.to(() => MatchDetailsPage(
+                                      matchDetails: matchDetails));
+                                },
+                                child: const Text('Match Details'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeamInfo(String teamName, int logoId) {
+    List<String> parts = teamName.split(' ');
+    String lastPart = parts.isNotEmpty ? parts.last : teamName;
+
+    return Column(
+      children: [
+        Image.asset(
+          'assets/team_logo/$logoId.png',
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          lastPart,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: secondaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVersusText(int team1Score, int team2Score) {
+    return Text(
+      '$team1Score - $team2Score',
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: secondaryColor,
+      ),
+    );
+  }
+
+  Widget _buildShimmerListView(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.8,
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[600]!,
+        highlightColor: Colors.grey[500]!,
+        child: ListView.builder(
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            return const ShimmerEffect();
+          },
+        ),
+      ),
+    );
+  }
+}

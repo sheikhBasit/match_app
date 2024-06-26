@@ -16,7 +16,7 @@ class HeadToHeadPage extends StatelessWidget {
     required this.awayTeamId,
   }) : super(key: key);
 
-  final HeadToHeadController headToHeadController = Get.put(HeadToHeadController());
+  final HeadToHeadController headToHeadController = Get.find<HeadToHeadController>();
 
   @override
   Widget build(BuildContext context) {

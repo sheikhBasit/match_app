@@ -32,12 +32,14 @@ class PrivacyPolicyPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Privacy Policy',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+            Center(
+              child: Text(
+                'Privacy Policy',
+                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Color.fromARGB(255, 240, 240, 240)
+                        : Colors.black,
+                  ),
               ),
             ),
             const SizedBox(height: 20),
@@ -46,22 +48,6 @@ class PrivacyPolicyPage extends StatelessWidget {
                 child: Text(
                   privacyPolicy.trim(),
                   style: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Back'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
                 ),
               ),
             ),

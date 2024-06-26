@@ -11,18 +11,17 @@ import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// Define the notification plugin
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 class LiveMatches extends StatefulWidget {
   @override
   _LiveMatchesState createState() => _LiveMatchesState();
 }
 
-// Define the notification plugin
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 class _LiveMatchesState extends State<LiveMatches> {
-  final MatchController matchController = Get.put(MatchController());
-  bool _showShimmer = true;
+  final MatchController matchController = Get.find<MatchController>();
 
   @override
   void initState() {
@@ -32,23 +31,13 @@ class _LiveMatchesState extends State<LiveMatches> {
     final InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
-    Timer(const Duration(seconds: 1), () {
-      setState(() {
-        _showShimmer = false;
-      });
-    });
   }
 
-@override
-  void dispose() {
-    super.dispose();
-    matchController.dispose();
-  }
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       if (matchController.isLoading.value) {
-        return _showShimmer ? _buildShimmerListView(context) : Container();
+        return _buildShimmerListView(context);
       } else {
         return RefreshIndicator(
           onRefresh: matchController.fetchTodayMatches,
@@ -58,12 +47,16 @@ class _LiveMatchesState extends State<LiveMatches> {
               children: [
                 matchController.todayMatches.isNotEmpty
                     ? _buildMatchList(context, matchController.todayMatches)
-                    : Center(child: Text('No matches found for today',
-                    style: TextStyle(
-            color:
-          Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, // Set label color based on theme
-        ),
-                    )),
+                    : Center(
+                        child: Text(
+                          'No matches found for today',
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -105,16 +98,18 @@ class _LiveMatchesState extends State<LiveMatches> {
     // Add "No live match available" text if no live matches
     if (liveMatches.isEmpty) {
       children.add(
-         Padding(
+        Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Center(
             child: Text(
               'No live match available',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, 
-            
-            color:
-          Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, // Set label color based on theme
-        ),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
             ),
           ),
         ),
@@ -144,7 +139,10 @@ class _LiveMatchesState extends State<LiveMatches> {
         onTap: () {
           if (matchDetails.status.short == 'NS') {
             // Navigate to head-to-head page
-            Get.to(() => HeadToHeadPage(homeTeamId: matchDetails.homeTeam.id.toString(), awayTeamId: matchDetails.awayTeam.id.toString(),));
+            Get.to(() => HeadToHeadPage(
+                  homeTeamId: matchDetails.homeTeam.id.toString(),
+                  awayTeamId: matchDetails.awayTeam.id.toString(),
+                ));
           } else {
             Get.to(() => MatchDetailsPage(matchDetails: matchDetails));
           }
@@ -169,7 +167,9 @@ class _LiveMatchesState extends State<LiveMatches> {
                             Text(
                               matchDetails.leagueName,
                               style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: secondaryColor),
                             ),
                           ],
                         ),
@@ -190,11 +190,13 @@ class _LiveMatchesState extends State<LiveMatches> {
                           children: [
                             Text(
                               'Date: ${DateFormat('yyyy-MM-dd').format(matchDetails.date)}',
-                              style: const TextStyle(fontSize: 16, color: secondaryColor),
+                              style: const TextStyle(
+                                  fontSize: 16, color: secondaryColor),
                             ),
                             Text(
                               'Time: ${matchDetails.time}',
-                              style: const TextStyle(fontSize: 16, color: secondaryColor),
+                              style: const TextStyle(
+                                  fontSize: 16, color: secondaryColor),
                             ),
                           ],
                         ),
@@ -203,15 +205,6 @@ class _LiveMatchesState extends State<LiveMatches> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  _showLiveStreamOptionsDialog(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                ),
-                                child: const Text('Live Stream'),
-                              ),
                               ElevatedButton(
                                 onPressed: () {
                                   Get.to(() => MatchDetailsPage(
@@ -240,7 +233,8 @@ class _LiveMatchesState extends State<LiveMatches> {
                       child: const Text(
                         'Live',
                         style: TextStyle(
-                            color: secondaryColor, fontWeight: FontWeight.bold),
+                            color: secondaryColor,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -256,12 +250,14 @@ class _LiveMatchesState extends State<LiveMatches> {
     if (matchDetails.status.long == 'Finished') {
       return Text(
         '${matchDetails.homeScore.total} - ${matchDetails.awayScore.total}',
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+        style: const TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
       );
     } else if (matchDetails.status.long == 'Not Started') {
       return const Text(
         'vs',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
+        style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: secondaryColor),
       );
     } else {
       // Extract the inning from the status
@@ -272,7 +268,8 @@ class _LiveMatchesState extends State<LiveMatches> {
         children: [
           Text(
             'Inning: ${matchDetails.status.long}',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: secondaryColor),
+            style: const TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: secondaryColor),
           ),
           if (inning.isNotEmpty &&
               matchDetails.homeScore.innings != null &&
@@ -291,7 +288,9 @@ class _LiveMatchesState extends State<LiveMatches> {
                     Text(
                       '${matchDetails.homeScore.innings![inning] ?? '-'} - ${matchDetails.awayScore.innings![inning] ?? '-'}',
                       style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold, color: secondaryColor),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: secondaryColor),
                     ),
                   ],
                 ),
@@ -315,7 +314,8 @@ class _LiveMatchesState extends State<LiveMatches> {
           fit: BoxFit.cover,
         ),
         const SizedBox(height: 8),
-        Text(lastPart, style: const TextStyle(fontSize: 16, color: secondaryColor)),
+        Text(lastPart,
+            style: const TextStyle(fontSize: 16, color: secondaryColor)),
       ],
     );
   }
@@ -335,7 +335,12 @@ class _LiveMatchesState extends State<LiveMatches> {
       ),
     );
   }
-  Future<void> _showLiveMatchNotification(String leagueName, String homeTeamName, String awayTeamName) async {
+
+  Future<void> _showLiveMatchNotification(String leagueName,
+      String homeTeamName, String awayTeamName) async {
+    if (!mounted) {
+      return;
+    }
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'live_match_notification',
@@ -368,7 +373,8 @@ class _LiveMatchesState extends State<LiveMatches> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Live Stream Channel', style: TextStyle(color: primaryColor)),
+          title: const Text('Select Live Stream Channel',
+              style: TextStyle(color: primaryColor)),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[

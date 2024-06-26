@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:match_app/common_widgets/theme_provider.dart';
+import 'package:match_app/features/screens/routes/bindings.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +12,6 @@ import 'package:match_app/common_widgets/connectivity_check.dart';
 import 'package:match_app/common_widgets/no_connectivity.dart';
 import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/controllers/notification_controller.dart';
-import 'package:match_app/features/controllers/standings_controller.dart';
 import 'package:match_app/features/screens/ads/app_open_ad.dart';
 import 'package:match_app/features/screens/home_screens/home_page.dart';
 import 'package:match_app/firebase_options.dart';
@@ -26,7 +26,6 @@ void main() async {
   );
   await GetStorage.init();
   Get.put(NotificationController());
-  Get.put(StandingsController());
   await MobileAds.instance.initialize();
   AppOpenAdManager.loadAppOpenAd();
   runApp(
@@ -46,10 +45,11 @@ class MyApp extends StatelessWidget {
       builder: (context, themeProvider, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'MLB Stream',
+          title: 'Baseball Live',
+          initialBinding: MainBindings(), // Set the initial binding here
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
-            primaryColor: const Color.fromRGBO(4, 66, 30, 1),
+            primaryColor: Color.fromARGB(255, 8, 4, 66),
             brightness: Brightness.light,
           ),
           darkTheme: ThemeData(
@@ -87,5 +87,4 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
 }

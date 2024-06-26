@@ -1,15 +1,19 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:match_app/common_widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:match_app/common_widgets/user_subscription.dart';
-import 'package:match_app/features/screens/ads/banner_ad.dart'; // Import BannerAdWidget
+import 'package:match_app/features/screens/ads/banner_ad.dart';
 import 'package:match_app/features/screens/drawer_pages/privacy_policy_page.dart';
 import 'package:match_app/features/screens/drawer_pages/terms_of_service_page.dart';
 import 'package:match_app/features/screens/home_screens/explore_page.dart';
-import 'package:match_app/features/screens/home_screens/past_matches_page.dart';
+import 'package:match_app/features/screens/home_screens/matches_page.dart';
 import 'package:match_app/features/screens/home_screens/standings_page.dart';
+import 'package:match_app/features/controllers/live_matches_controller.dart'; // Import the controller
+import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -40,28 +44,54 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return SafeArea(
-      bottom: false, // This ensures that content is rendered below the system's bottom navigation bar
+      bottom: false,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
             appBarTitle,
             style: Theme.of(context).textTheme.headlineLarge!.copyWith(
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
+                      ? const Color.fromARGB(255, 240, 240, 240)
                       : Colors.black,
                 ),
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.brightness_6),
+              icon: const Icon(Icons.brightness_6),
               onPressed: () {
-                Provider.of<ThemeProvider>(context, listen: false)
-                    .toggleTheme();
+                Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
               },
             ),
           ],
         ),
-        drawer: const Drawer(),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              _buildDrawerHeader(),
+              ListTile(
+                leading: const Icon(Icons.privacy_tip),
+                title: const Text('Privacy Policy'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.description),
+                title: const Text('Terms of Service'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TermsOfServicePage()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
         body: Column(
           children: [
             Expanded(
@@ -74,47 +104,44 @@ class _HomePageState extends State<HomePage> {
                 children: bottomBarPages,
               ),
             ),
-            if (!UserSubscription.isSubscribed) BannerAdWidget(), // Conditionally show BannerAdWidget
+            if (!UserSubscription.isSubscribed) const BannerAdWidget(),
           ],
         ),
         bottomNavigationBar: CurvedNavigationBar(
           index: _selectedIndex,
-          backgroundColor: Colors.grey[900]!, // Dark grey color
-          color: const Color.fromARGB(255, 36, 37, 46), // Color of the selected icon
-          buttonBackgroundColor: Colors.grey[900], // Dark grey color for the button background
+          backgroundColor: Colors.grey[900]!,
+          color: const Color.fromARGB(255, 36, 37, 46),
+          buttonBackgroundColor: Colors.grey[900],
           items: const [
             CurvedNavigationBarItem(
               child: Icon(
                 Icons.home,
-                color: Colors.red, // Red color for the icon
+                color: Colors.red,
               ),
-          labelStyle: TextStyle(
-            color:
-           Colors.white , // Set label color based on theme
-        ),    label: 'Home',
+              labelStyle: TextStyle(
+                color: Colors.white,
+              ),
+              label: 'Home',
             ),
             CurvedNavigationBarItem(
               child: Icon(
                 Icons.sports_baseball_rounded,
-                color: Colors.red, // Red color for the icon
+                color: Colors.red,
               ),
               labelStyle: TextStyle(
-            color:
-           Colors.white , // Set label color based on theme
-        ),
+                color: Colors.white,
+              ),
               label: 'Schedule',
             ),
             CurvedNavigationBarItem(
-               labelStyle: TextStyle(
-            color:
-           Colors.white , // Set label color based on theme
-        ),
               child: Icon(
                 Icons.stacked_line_chart_rounded,
-                color: Colors.red, // Red color for the icon
+                color: Colors.red,
+              ),
+              labelStyle: TextStyle(
+                color: Colors.white,
               ),
               label: 'Standings',
-              
             ),
           ],
           onTap: (index) {
@@ -127,7 +154,7 @@ class _HomePageState extends State<HomePage> {
               );
             });
           },
-         ),
+        ),
       ),
     );
   }
@@ -147,35 +174,28 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDrawerHeader() {
     return DrawerHeader(
       decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 0, 39, 71),
+        color: Color.fromARGB(255, 109, 161, 203),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDrawerItem(
-            title: 'Privacy Policy',
-            icon: Icons.privacy_tip,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PrivacyPolicyPage(),
+          Row(
+            children: [
+              Image.asset(
+                'assets/logo/logo.png',
+                width: 50,
+                height: 50,
+              ),
+              const Text(
+                'Baseball Live',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
                 ),
-              );
-            },
+              ),
+            ],
           ),
-          _buildDrawerItem(
-            title: 'Terms of Service',
-            icon: Icons.description,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TermsOfServicePage(),
-                ),
-              );
-            },
-          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

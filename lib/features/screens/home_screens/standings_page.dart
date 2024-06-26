@@ -7,38 +7,43 @@ import 'package:match_app/features/screens/home_screens/conference_standings.dar
 import 'package:match_app/features/controllers/standings_controller.dart';
 
 class TournamentStandings extends StatelessWidget {
-  final StandingsController standingsController = Get.put(StandingsController());
+  final StandingsController standingsController = Get.find<StandingsController>();
 
   TournamentStandings({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Obx(() {
-          if (standingsController.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (standingsController.standings.isNotEmpty) {
-              return _buildStandingsView(context);
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Obx(() {
+            if (standingsController.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
             } else {
-              // Check if there was an error fetching data
-              final bool standingsError = GetStorage().read('standingsError') ?? false;
-              if (standingsError) {
-                // Display last successful state
-                final List<dynamic>? lastStandings = GetStorage().read('lastStandings');
-                if (lastStandings != null) {
-                  standingsController.standings.assignAll(lastStandings as Iterable<TeamStanding>);
-                  return _buildStandingsView(context);
+              if (standingsController.standings.isNotEmpty) {
+                return _buildStandingsView(context);
+              } else {
+                // Check if there was an error fetching data
+                final bool standingsError = GetStorage().read('standingsError') ?? false;
+                if (standingsError) {
+                  // Display last successful state
+                  final List<dynamic>? lastStandings = GetStorage().read('lastStandings');
+                  if (lastStandings != null) {
+                    standingsController.standings.assignAll(
+                      lastStandings.map((e) => TeamStanding.fromJson(e)).toList()
+                    );
+                    return _buildStandingsView(context);
+                  } else {
+                    return const Center(child: Text('No standings available.'));
+                  }
                 } else {
                   return const Center(child: Text('No standings available.'));
                 }
-              } else {
-                return const Center(child: Text('No standings available.'));
               }
             }
-          }
-        }),
+          }),
+        ),
       ),
     );
   }
@@ -76,6 +81,7 @@ class TournamentStandings extends StatelessWidget {
       ),
     );
   }
+
 
   Future<void> _refreshStandings() async {
     // Check connectivity

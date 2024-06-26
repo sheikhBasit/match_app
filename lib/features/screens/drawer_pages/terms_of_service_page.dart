@@ -30,7 +30,9 @@ class TermsOfServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -38,33 +40,18 @@ class TermsOfServicePage extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: [
-                  const Text(
-                    'Terms of Service',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
-                    ),
-                  ),
+                   Center(
+                     child: Text(
+                      'Terms of Service',
+                                       style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                                       color: Theme.of(context).brightness == Brightness.dark
+                        ? Color.fromARGB(255, 240, 240, 240)
+                        : Colors.black,
+                                     ),),
+                   ),
                   const SizedBox(height: 20),
                   ..._buildTermsOfServiceSections(),
                 ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Back'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
               ),
             ),
           ],
