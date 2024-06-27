@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'dart:developer' as developer;
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:match_app/common_widgets/theme_provider.dart';
 import 'package:match_app/features/screens/routes/bindings.dart';
 import 'package:provider/provider.dart';
@@ -37,8 +42,62 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
+
+  final Connectivity _connectivity = Connectivity();
+
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+
+@override
+  void initState() {
+    super.initState();
+    initConnectivity();
+
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    late List<ConnectivityResult> result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      developer.log('Couldn\'t check connectivity status', error: e);
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+    // ignore: avoid_print
+    print('Connectivity changed: $_connectionStatus');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,30 +136,17 @@ class MyApp extends StatelessWidget {
             ),
           ),
           themeMode: themeProvider.currentTheme,
-          home: ConnectivityBuilder(
-            builder: (BuildContext context, ConnectivityStatus status) {
-              if (status == ConnectivityStatus.offline) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('No internet connection.'),
-                    ),
-                  );
-                });
-              }
-              final bool isConnected = status == ConnectivityStatus.online;
-              return AnimatedSplashScreen(
+          home:  AnimatedSplashScreen(
                 duration: 3000,
                 splash: Image.asset(
                   'assets/logo/logo.png',
                   width: MediaQuery.of(context).size.width * 0.8,
                   height: MediaQuery.of(context).size.width * 0.8,
                 ),
-                nextScreen: isConnected ? const HomePage() : const NoInternetScreen(),
+                nextScreen: const HomePage() ,
                 splashTransition: SplashTransition.fadeTransition,
                 backgroundColor: themeProvider.isDarkTheme ? backgroundColor : Colors.white,
-              );
-            },
+              
           ),
         );
       },

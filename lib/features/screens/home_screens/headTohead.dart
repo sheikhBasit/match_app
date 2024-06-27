@@ -3,10 +3,12 @@ import 'dart:async'; // Import the dart:async package for Timer
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:match_app/common_widgets/shimmer_effect.dart';
 import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/controllers/headTohead_controller.dart';
 import 'package:match_app/features/models/h2h_model.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
+import 'package:shimmer/shimmer.dart';
 import '../ads/interstitial_ad.dart'; // Import your InterstitialAdManager
 
 class HeadToHeadPage extends StatefulWidget {
@@ -68,7 +70,7 @@ class _HeadToHeadPageState extends State<HeadToHeadPage> {
             builder: (controller) {
               if (controller.isLoading.value) {
                 // Show circular loading indicator while data is being fetched
-                return CircularProgressIndicator();
+                return _buildShimmerListView(context);
               } else if (controller.headToHeadMatches.isEmpty) {
                 return const Text('No head-to-head matches found.');
               } else {
@@ -218,5 +220,21 @@ class _HeadToHeadPageState extends State<HeadToHeadPage> {
   double cardWidth(BuildContext context) {
     return MediaQuery.of(context).size.width * 0.9;
   }
+  Widget _buildShimmerListView(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.8,
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[600]!,
+        highlightColor: Colors.grey[500]!,
+        child: ListView.builder(
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            return const ShimmerEffect();
+          },
+        ),
+      ),
+    );
+  }
+
 }
 

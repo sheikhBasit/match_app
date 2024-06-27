@@ -25,21 +25,11 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
   late TabController _tabController;
   late Timer? _timer; // Make the Timer nullable
 
-  bool _showShimmer = true;
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
-
-    Timer(const Duration(seconds: 1), () {
-      if (mounted) { // Check if the widget is still mounted before setState
-        setState(() {
-          _showShimmer = false;
-        });
-      }
-    });
 
     _fetchData(); // Initial fetch
 
@@ -64,9 +54,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
 
   void _fetchData() {
     if (_tabController.index == 0) {
-      upcomingMatchesController.fetchUpcomingMatches(showShimmer: false);
+      upcomingMatchesController.fetchUpcomingMatches(showShimmer: true);
     } else {
-      pastMatchesController.fetchPastMatches(showShimmer: false);
+      pastMatchesController.fetchPastMatches(showShimmer: true);
     }
   }
 
@@ -110,9 +100,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     return Obx(() {
       return RefreshIndicator(
         onRefresh: () async {
-          await upcomingMatchesController.fetchUpcomingMatches(showShimmer: false);
+          await upcomingMatchesController.fetchUpcomingMatches(showShimmer: true);
         },
-        child: _showShimmer && upcomingMatchesController.upcomingMatches.isEmpty
+        child: upcomingMatchesController.isLoading.value
             ? _buildShimmerListView(context)
             : ListView.builder(
                 itemCount: upcomingMatchesController.upcomingMatches.length,
@@ -129,9 +119,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     return Obx(() {
       return RefreshIndicator(
         onRefresh: () async {
-          await pastMatchesController.fetchPastMatches(showShimmer: false);
+          await pastMatchesController.fetchPastMatches(showShimmer: true);
         },
-        child: _showShimmer && pastMatchesController.pastMatches.isEmpty
+        child: pastMatchesController.isLoading.value
             ? _buildShimmerListView(context)
             : ListView.builder(
                 itemCount: pastMatchesController.pastMatches.length,
