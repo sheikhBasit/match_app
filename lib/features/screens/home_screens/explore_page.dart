@@ -202,20 +202,16 @@ class _LiveMatchesState extends State<LiveMatches> {
                         ),
                         if (matchDetails.status.long != 'Finished' &&
                             matchDetails.status.long != 'Not Started')
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                          Center(
+                            child:
                               ElevatedButton(
                                 onPressed: () {
                                   Get.to(() => MatchDetailsPage(
                                       matchDetails: matchDetails));
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                ),
                                 child: const Text('Match Details'),
                               ),
-                            ],
+                            
                           ),
                       ],
                     ),
@@ -267,6 +263,11 @@ class _LiveMatchesState extends State<LiveMatches> {
       return Column(
         children: [
           Text(
+      '${matchDetails.homeScore.total ?? 0} - ${matchDetails.awayScore.total ?? 0}',
+      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 5, ),
+          Text(
             'Inning: ${matchDetails.status.long}',
             style: const TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: secondaryColor),
@@ -282,13 +283,9 @@ class _LiveMatchesState extends State<LiveMatches> {
                 Column(
                   children: [
                     Text(
-                      'Inning $inning',
-                      style: const TextStyle(fontSize: 12, color: secondaryColor),
-                    ),
-                    Text(
                       '${matchDetails.homeScore.innings![inning] ?? '-'} - ${matchDetails.awayScore.innings![inning] ?? '-'}',
                       style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: secondaryColor),
                     ),
