@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:match_app/common_widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
@@ -28,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   int maxCount = 3;
   String appBarTitle = 'Today Matches';
   int _selectedIndex = 0;
+  bool notificationsEnabled = false; // Track notification state
 
   @override
   void dispose() {
@@ -38,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> bottomBarPages = [
-      LiveMatches(),
+      LiveMatches(notificationsEnabled: notificationsEnabled),
       const MatchesPage(),
       TournamentStandings(),
     ];
@@ -49,21 +51,38 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: Text(
             appBarTitle,
-            
             style: TextStyle(
               color: Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 240, 240, 240)
                   : Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.brightness_6),
+              icon: Icon(Icons.brightness_6),
               onPressed: () {
-                Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .toggleTheme();
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.notifications,
+                color: notificationsEnabled ? Colors.yellow : Colors.grey,
+              ),
+              onPressed: () {
+                setState(() {
+                  notificationsEnabled = !notificationsEnabled;
+                });
+                if (notificationsEnabled) {
+                  // Enable notifications logic here
+                  // Example: Get.find<NotificationController>().enableNotifications();
+                } else {
+                  // Disable notifications logic here
+                  // Example: Get.find<NotificationController>().disableNotifications();
+                }
               },
             ),
           ],
@@ -79,7 +98,9 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
+                    MaterialPageRoute(
+                      builder: (context) => PrivacyPolicyPage(),
+                    ),
                   );
                 },
               ),
@@ -89,7 +110,9 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => TermsOfServicePage()),
+                    MaterialPageRoute(
+                      builder: (context) => TermsOfServicePage(),
+                    ),
                   );
                 },
               ),
@@ -108,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 children: bottomBarPages,
               ),
             ),
-             const BannerAdWidget(),
+            const BannerAdWidget(),
           ],
         ),
         bottomNavigationBar: CurvedNavigationBar(

@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:match_app/common_widgets/shimmer_effect.dart';
 import 'package:match_app/constants/constants.dart';
 import 'package:match_app/constants/notifications/notification_controller.dart';
 import 'package:match_app/features/controllers/live_matches_controller.dart';
-import 'package:match_app/features/models/game_model.dart'; // Import Game model
+import 'package:match_app/features/models/game_model.dart';
 import 'package:match_app/features/screens/home_screens/headTohead.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
 import 'package:match_app/features/screens/home_screens/stream_page.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:intl/intl.dart';
-import 'dart:async';
 import 'package:get_storage/get_storage.dart';
 
 class LiveMatches extends StatefulWidget {
+  final bool notificationsEnabled;
+
+  const LiveMatches({Key? key, required this.notificationsEnabled}) : super(key: key);
+
   @override
   _LiveMatchesState createState() => _LiveMatchesState();
 }
 
 class _LiveMatchesState extends State<LiveMatches> {
   final MatchController matchController = Get.find<MatchController>();
-  final NotificationController notificationController =
-      Get.find<NotificationController>();
+  final NotificationController notificationController = Get.find<NotificationController>();
   final box = GetStorage();
 
   @override
@@ -73,7 +75,7 @@ class _LiveMatchesState extends State<LiveMatches> {
         liveMatches.add(match);
         // Check if notification already shown for this match
         bool notificationShown = box.read('shownMatches')?.contains(match.id) ?? false;
-        if (!notificationShown) {
+        if (!notificationShown && widget.notificationsEnabled) {
           notificationController.showNotification(
             "Live Match",
             match.homeTeam.name,
@@ -197,15 +199,13 @@ class _LiveMatchesState extends State<LiveMatches> {
                         if (matchDetails.status.long != 'Finished' &&
                             matchDetails.status.long != 'Not Started')
                           Center(
-                            child:
-                              ElevatedButton(
-                                onPressed: () {
-                                  Get.to(() => MatchDetailsPage(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Get.to(() => MatchDetailsPage(
                                       matchDetails: matchDetails));
-                                },
-                                child: const Text('Match Details'),
-                              ),
-                            
+                              },
+                              child: const Text('Match Details'),
+                            ),
                           ),
                       ],
                     ),
@@ -257,12 +257,14 @@ class _LiveMatchesState extends State<LiveMatches> {
       return Column(
         children: [
           Text(
-      '${matchDetails.homeScore.total ?? 0} - ${matchDetails.awayScore.total ?? 0}',
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 5, ),
+            '${matchDetails.homeScore.total ?? 0} - ${matchDetails.awayScore.total ?? 0}',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 5,
+          ),
           Text(
-            'Inning: ${matchDetails.status.long}',
+            '${matchDetails.status.long}',
             style: const TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: secondaryColor),
           ),
@@ -327,53 +329,3 @@ class _LiveMatchesState extends State<LiveMatches> {
     );
   }
 }
-
-  // Check if the match is live
-  bool _isLive(String statusShort) {
-    final liveStatuses = ['NS', 'FT', 'POST', 'CANC', 'INTR', 'ABD'];
-    return !liveStatuses.contains(statusShort);
-  }
-
-  Future<void> _showLiveStreamOptionsDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Live Stream Channel',
-              style: TextStyle(color: primaryColor)),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                _buildChannelOption(context, 'Channel 1'),
-                _buildChannelOption(context, 'Channel 2'),
-                _buildChannelOption(context, 'Channel 3'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close', style: TextStyle(color: primaryColor)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildChannelOption(BuildContext context, String channelName) {
-    return ListTile(
-      title: Text(channelName, style: const TextStyle(color: primaryColor)),
-      onTap: () {
-        // Perform action when channel option is selected
-        // For example, navigate to the selected channel page
-        // Replace the below navigation logic with your actual implementation
-        Navigator.of(context).pop(); // Close the dialog
-        // Navigate to the selected channel page
-        Get.to(() => StreamingPage(channelName: channelName));
-      },
-    );
-  }
-
