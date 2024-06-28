@@ -11,6 +11,7 @@ import 'package:match_app/features/screens/home_screens/stream_page.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+import 'package:get_storage/get_storage.dart';
 
 class LiveMatches extends StatefulWidget {
   @override
@@ -19,7 +20,9 @@ class LiveMatches extends StatefulWidget {
 
 class _LiveMatchesState extends State<LiveMatches> {
   final MatchController matchController = Get.find<MatchController>();
-  final NotificationController notificationController = Get.find<NotificationController>();
+  final NotificationController notificationController =
+      Get.find<NotificationController>();
+  final box = GetStorage();
 
   @override
   void initState() {
@@ -64,17 +67,25 @@ class _LiveMatchesState extends State<LiveMatches> {
     List<Game> otherMatches = [];
 
     for (Game match in matchList) {
-    if (match.status.long == 'Not Started' || match.status.long == 'Finished') {
-      otherMatches.add(match);
-    } else {
-      liveMatches.add(match);
-      notificationController.showNotification(
-        "Live Match",
-        match.homeTeam.name,
-        match.awayTeam.name,
-      );
+      if (match.status.long == 'Not Started' || match.status.long == 'Finished') {
+        otherMatches.add(match);
+      } else {
+        liveMatches.add(match);
+        // Check if notification already shown for this match
+        bool notificationShown = box.read('shownMatches')?.contains(match.id) ?? false;
+        if (!notificationShown) {
+          notificationController.showNotification(
+            "Live Match",
+            match.homeTeam.name,
+            match.awayTeam.name,
+          );
+          // Store match ID to prevent showing notification again
+          List<int> shownMatches = box.read('shownMatches')?.cast<int>() ?? [];
+          shownMatches.add(match.id);
+          box.write('shownMatches', shownMatches);
+        }
+      }
     }
-  }
 
     otherMatches.sort((a, b) {
       if (a.status.long == 'Not Started' && b.status.long == 'Finished') {
@@ -115,7 +126,6 @@ class _LiveMatchesState extends State<LiveMatches> {
     );
   }
 
-
   Widget _buildGameItem(BuildContext context, Game matchDetails) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -124,9 +134,9 @@ class _LiveMatchesState extends State<LiveMatches> {
           if (matchDetails.status.short == 'NS') {
             // Navigate to head-to-head page
             Get.to(() => HeadToHeadPage(
-                  homeTeamId: matchDetails.homeTeam.id.toString(),
-                  awayTeamId: matchDetails.awayTeam.id.toString(),
-                ));
+              homeTeamId: matchDetails.homeTeam.id.toString(),
+              awayTeamId: matchDetails.awayTeam.id.toString(),
+            ));
           } else {
             Get.to(() => MatchDetailsPage(matchDetails: matchDetails));
           }
@@ -316,9 +326,7 @@ class _LiveMatchesState extends State<LiveMatches> {
       ),
     );
   }
-
-
-  }
+}
 
   // Check if the match is live
   bool _isLive(String statusShort) {
