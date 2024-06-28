@@ -102,7 +102,7 @@ class _LiveMatchesState extends State<LiveMatches> {
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Center(
             child: Text(
-              'No live match available',
+              'No live match right now',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
