@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:match_app/common_widgets/shimmer_effect.dart';
 import 'package:match_app/constants/constants.dart';
+import 'package:match_app/constants/notifications/notification_controller.dart';
 import 'package:match_app/features/controllers/live_matches_controller.dart';
 import 'package:match_app/features/models/game_model.dart'; // Import Game model
 import 'package:match_app/features/screens/home_screens/headTohead.dart';
@@ -10,10 +11,6 @@ import 'package:match_app/features/screens/home_screens/stream_page.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// Define the notification plugin
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
 class LiveMatches extends StatefulWidget {
   @override
@@ -22,15 +19,12 @@ class LiveMatches extends StatefulWidget {
 
 class _LiveMatchesState extends State<LiveMatches> {
   final MatchController matchController = Get.find<MatchController>();
+  final NotificationController notificationController = Get.find<NotificationController>();
 
   @override
   void initState() {
     super.initState();
-    final AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    final InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    notificationController.initializeNotification();
   }
 
   @override
@@ -66,49 +60,45 @@ class _LiveMatchesState extends State<LiveMatches> {
   }
 
   Widget _buildMatchList(BuildContext context, List<Game> matchList) {
-    // Separate live matches from other matches
     List<Game> liveMatches = [];
     List<Game> otherMatches = [];
 
-    // Categorize matches
     for (Game match in matchList) {
-      if (match.status.long == 'Not Started' ||
-          match.status.long == 'Finished') {
-        otherMatches.add(match);
-      } else {
-        liveMatches.add(match);
-      }
+    if (match.status.long == 'Not Started' || match.status.long == 'Finished') {
+      otherMatches.add(match);
+    } else {
+      liveMatches.add(match);
+      notificationController.showNotification(
+        "Live Match",
+        match.homeTeam.name,
+        match.awayTeam.name,
+      );
     }
+  }
 
-    // Sort other matches by status
     otherMatches.sort((a, b) {
       if (a.status.long == 'Not Started' && b.status.long == 'Finished') {
         return -1;
-      } else if (a.status.long == 'Finished' &&
-          b.status.long == 'Not Started') {
+      } else if (a.status.long == 'Finished' && b.status.long == 'Not Started') {
         return 1;
       } else {
         return 0;
       }
     });
 
-    // Combine live matches and other matches
     List<Widget> children = [];
 
-    // Add "No live match available" text if no live matches
     if (liveMatches.isEmpty) {
       children.add(
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Center(
             child: Text(
               'No live match right now',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
               ),
             ),
           ),
@@ -116,21 +106,15 @@ class _LiveMatchesState extends State<LiveMatches> {
       );
     }
 
-    // Add live matches
-    children.addAll(
-      liveMatches.map((match) => _buildGameItem(context, match)).toList(),
-    );
-
-    // Add other matches
-    children.addAll(
-      otherMatches.map((match) => _buildGameItem(context, match)).toList(),
-    );
+    children.addAll(liveMatches.map((match) => _buildGameItem(context, match)).toList());
+    children.addAll(otherMatches.map((match) => _buildGameItem(context, match)).toList());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: children,
     );
   }
+
 
   Widget _buildGameItem(BuildContext context, Game matchDetails) {
     return Padding(
@@ -333,30 +317,7 @@ class _LiveMatchesState extends State<LiveMatches> {
     );
   }
 
-  Future<void> _showLiveMatchNotification(String leagueName,
-      String homeTeamName, String awayTeamName) async {
-    if (!mounted) {
-      return;
-    }
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'live_match_notification',
-      'Live Match Notification',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      styleInformation: DefaultStyleInformation(true, true),
-    );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Live Match',
-      '$leagueName: $homeTeamName vs $awayTeamName is live now!',
-      platformChannelSpecifics,
-      payload: 'Live Match',
-    );
   }
 
   // Check if the match is live
@@ -407,4 +368,4 @@ class _LiveMatchesState extends State<LiveMatches> {
       },
     );
   }
-}
+
