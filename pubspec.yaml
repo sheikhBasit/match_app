@@ -62,7 +62,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   internet_connectivity_checker: ^1.0.2
   wakelock: ^0.6.2
-  image: ^3.0.1
+  image: ^4.2.0
 
   intl: any
   sweet_nav_bar: ^1.0.7
