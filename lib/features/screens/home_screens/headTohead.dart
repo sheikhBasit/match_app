@@ -3,11 +3,8 @@ import 'dart:async'; // Import the dart:async package for Timer
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-<<<<<<< Updated upstream
 import 'package:match_app/common_widgets/shimmer_effect.dart';
 import 'package:match_app/constants/constants.dart';
-=======
->>>>>>> Stashed changes
 import 'package:match_app/features/controllers/headTohead_controller.dart';
 import 'package:match_app/features/models/h2h_model.dart';
 import 'package:match_app/features/screens/home_screens/match_details_page.dart';
@@ -65,7 +62,6 @@ class _HeadToHeadPageState extends State<HeadToHeadPage> {
       appBar: AppBar(
         title: const Text('Encounters'),
       ),
-<<<<<<< Updated upstream
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -235,84 +231,9 @@ class _HeadToHeadPageState extends State<HeadToHeadPage> {
           itemBuilder: (context, index) {
             return const ShimmerEffect();
           },
-=======
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Head-to-Head Matches',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            GetBuilder<HeadToHeadController>(
-              init: headToHeadController,
-              initState: (_) {
-                // Fetch head-to-head matches when the view initializes
-                headToHeadController.fetchHeadToHeadMatches(homeTeamId, awayTeamId);
-              },
-              builder: (controller) {
-                if (controller.headToHeadMatches.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text('No head-to-head matches found.'),
-                  );
-                } else {
-                  return Column(
-                    children: controller.headToHeadMatches.map((match) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Image.asset('assets/team_logo/${match.homeTeam.id}', width: 50, height: 50),
-                                const SizedBox(width: 10),
-                                Text(match.homeTeam.name),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('${match.homeScore.total} - ${match.awayScore.total}'),
-                                Text('Innings: ${match.homeScore.innings}'),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text(match.awayTeam.name),
-                                const SizedBox(width: 10),
-                                Image.asset('assets/team_logo/${match.awayTeam.id}', width: 50, height: 50),
-                              ],
-                            ),
-                            if (match.status.short == 'NS') // Display Date and Time if status is NS
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Date: ${DateFormat('yyyy-MM-dd').format(match.date)}'),
-                                  Text('Time: ${match.time}'),
-                                ],
-                              ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }
-              },
-            ),
-          ],
->>>>>>> Stashed changes
         ),
       ),
     );
   }
 
 }
-
