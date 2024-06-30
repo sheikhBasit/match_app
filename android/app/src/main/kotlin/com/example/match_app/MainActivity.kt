@@ -1,4 +1,4 @@
-package com.example.match_app
+package com.nomdevs.baseball_live
 
 import io.flutter.embedding.android.FlutterActivity
 
