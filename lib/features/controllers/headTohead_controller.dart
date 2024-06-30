@@ -1,6 +1,10 @@
-import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+<<<<<<< Updated upstream
 import 'package:match_app/features/models/h2h_model.dart'; // Updated import
+=======
+import 'package:get/get.dart';
+import 'package:match_app/features/models/game_model.dart';
+>>>>>>> Stashed changes
 
 class HeadToHeadController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -48,8 +52,15 @@ class HeadToHeadController extends GetxController {
         // Set loading state to false
         isLoading(false);
 
+<<<<<<< Updated upstream
         // Trigger UI update
         update();
+=======
+        // Sort matches by date in descending order
+        matches.sort((a, b) => b.date.compareTo(a.date));
+
+        headToHeadMatches.assignAll(matches);
+>>>>>>> Stashed changes
       } else {
         // Set loading state to false
         isLoading(false);

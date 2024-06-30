@@ -13,9 +13,26 @@ class UpcomingMatchesController extends GetxController {
 
   @override
   void onInit() {
+<<<<<<< Updated upstream
+=======
+    fetchUpcomingMatches(showShimmer: true);
+    _setupTimer();
+>>>>>>> Stashed changes
     super.onInit();
     fetchUpcomingMatches(showShimmer: true);
     _setupTimer();
+  }
+
+  @override
+  void onClose() {
+    _timer?.cancel();
+    super.onClose();
+  }
+
+  void _setupTimer() {
+    _timer = Timer.periodic(const Duration(minutes: 30), (Timer t) async {
+      await fetchUpcomingMatches(showShimmer: false);
+    });
   }
 
   @override
@@ -40,6 +57,7 @@ class UpcomingMatchesController extends GetxController {
       print(
           'Fetching matches starting from: ${DateFormat('yyyy-MM-dd').format(today)}');
       for (int i = 1; i <= 9; i++) {
+<<<<<<< Updated upstream
         String dateStr =
             DateFormat('yyyy-MM-dd').format(today.add(Duration(days: i)));
         print('Fetching matches for date: $dateStr');
@@ -50,6 +68,12 @@ class UpcomingMatchesController extends GetxController {
         List<Game> dayGamesList =
             matchesData.map((match) => Game.fromJson(match)).toList();
         print('Parsed games for $dateStr: $dayGamesList');
+=======
+        String dateStr = DateFormat('yyyy-MM-dd').format(today.add(Duration(days: i)));
+        Map<String, dynamic> dayGames = await _firestoreService.getGamesByDate(dateStr);
+        List<dynamic> matchesData = dayGames['matches'] ?? [];
+        List<Game> dayGamesList = matchesData.map((match) => Game.fromJson(match)).toList();
+>>>>>>> Stashed changes
         upcomingMatches.addAll(dayGamesList);
       }
       print('All upcoming matches: $upcomingMatches');
