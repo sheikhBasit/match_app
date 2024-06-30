@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/models/game_model.dart';
 import 'package:match_app/features/models/h2h_model.dart'; // Ensure this import for HeadToHeadMatch
 import 'package:intl/intl.dart';
@@ -63,6 +64,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
+              color: cardBackgroundColor(context),
               elevation: 5,
               shadowColor: Colors.grey,
               child: Padding(
@@ -90,13 +92,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
                               : widget.headToHeadDetails!.homeTeam.id.toString(),
                         ),
                         _buildVersusText(
-                          widget.matchDetails != null
-                              ? widget.matchDetails!.homeScore.total
-                              : widget.headToHeadDetails!.homeScore.total,
-                          widget.matchDetails != null
-                              ? widget.matchDetails!.awayScore.total
-                              : widget.headToHeadDetails!.awayScore.total,
-                        ),
+                          widget.matchDetails
+                          ),
                         _buildTeamInfo(
                           widget.matchDetails != null
                               ? widget.matchDetails!.awayTeam.name
@@ -213,12 +210,49 @@ class _MatchDetailsPageState extends State<MatchDetailsPage>
     );
   }
 
-  Widget _buildVersusText(int? team1Score, int? team2Score) {
-    return Text(
-      '${team1Score ?? 0} - ${team2Score ?? 0}',
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-    );
+  Widget _buildVersusText(Game? matchDetails) {
+    String inning =
+          matchDetails!.status.long.replaceAll(RegExp(r'[^0-9]'), '');
+
+      return Column(
+        children: [
+          Text(
+            '${matchDetails.homeScore.total ?? 0} - ${matchDetails.awayScore.total ?? 0}',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Text(
+            '${matchDetails.status.long}',
+            style: const TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: secondaryColor),
+          ),
+          if (inning.isNotEmpty &&
+              matchDetails.homeScore.innings != null &&
+              matchDetails.awayScore.innings != null &&
+              matchDetails.homeScore.innings!.containsKey(inning) &&
+              matchDetails.awayScore.innings!.containsKey(inning))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      '${matchDetails.homeScore.innings![inning] ?? '-'} - ${matchDetails.awayScore.innings![inning] ?? '-'}',
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: secondaryColor),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+        ],
+      );
   }
+
 
   Widget _buildTeamInnings(String teamName, String hits, String errors,
       Map<String, dynamic>? innings) {

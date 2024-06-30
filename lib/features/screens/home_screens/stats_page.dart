@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:match_app/common_widgets/match_circles.dart';
 import 'package:match_app/common_widgets/user_subscription.dart';
+import 'package:match_app/constants/constants.dart';
 import 'package:match_app/features/controllers/standings_controller.dart';
 import 'package:match_app/features/models/team_standing.dart';
 import 'package:match_app/features/screens/ads/banner_ad.dart';
@@ -139,6 +140,7 @@ class _StatsPageState extends State<StatsPage> {
 
   Widget _buildInfoCard(int teamId, String title, List<String> details) {
     return Card(
+      color: cardBackgroundColor(context),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
@@ -187,6 +189,7 @@ class _StatsPageState extends State<StatsPage> {
 
   Widget _buildFormCard(TeamStanding teamStanding) {
     return Card(
+      color: cardBackgroundColor(context),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
@@ -215,6 +218,7 @@ class _StatsPageState extends State<StatsPage> {
 
   Widget _buildStatsCard(String title, List<Widget> rows) {
     return Card(
+      color: cardBackgroundColor(context),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
