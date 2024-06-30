@@ -23,6 +23,12 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+  def keystoreProperties = new Properties()
+  def keystorePropertiesFile = rootProject.file('key.properties')
+   if (keystorePropertiesFile.exists()) {
+       keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+   }
+
 android {
     namespace "com.nomdevs.baseball_live"
     compileSdk flutter.compileSdkVersion
@@ -39,9 +45,17 @@ android {
     }
 
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+        main.java.srcDirs = 'src/main/kotlin'
     }
 
+    signingConfigs {
+           release {
+               keyAlias keystoreProperties['keyAlias']
+               keyPassword keystoreProperties['keyPassword']
+               storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+               storePassword keystoreProperties['storePassword']
+           }
+       }
     defaultConfig {
         applicationId "com.nomdevs.baseball_live"
         minSdkVersion 21
